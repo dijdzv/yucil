@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {
   Box,
@@ -11,8 +11,13 @@ import {
   Toolbar,
 } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import ReactPlayer from 'react-player/youtube';
+import { getName, getVersion } from '@tauri-apps/api/app';
 import { Bar } from './Bar';
 import Lists from './List';
+
+const appName = await getName();
+const appVersion = await getVersion();
 
 function Copyright(props: any) {
   return (
@@ -23,8 +28,12 @@ function Copyright(props: any) {
       {...props}
     >
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        yucil
+      <Link
+        color="inherit"
+        href="https://github.com/dijdzv/yucil"
+        target="_blank"
+      >
+        {appName + ' v' + appVersion}
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -43,6 +52,14 @@ export default function DashboardContent() {
       }),
     [prefersDarkMode]
   );
+  const [url, setUrl] = useState('');
+  useEffect(() => {
+    (async () => {
+      const url =
+        'https://www.youtube.com/watch?v=XPUN-w543bc&list=RDXPUN-w543bc&start_radio=1';
+      setUrl(url);
+    })();
+  });
 
   return (
     <ThemeProvider theme={theme}>
@@ -58,11 +75,20 @@ export default function DashboardContent() {
                 : theme.palette.grey[900],
             flexGrow: 1,
             height: '100vh',
-            overflow: 'auto',
+            overflow: 'hidden',
           }}
         >
-          <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Container
+            maxWidth="lg"
+            sx={{
+              mt: '6rem',
+              height: 'calc(100% - 6rem)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <ReactPlayer url={url} controls={true} loop={true} />
             <Lists />
 
             {/* <Grid container spacing={3}>
@@ -99,7 +125,7 @@ export default function DashboardContent() {
                 </Paper>
               </Grid>
                 </Grid> */}
-            <Copyright sx={{ pt: 4 }} />
+            <Copyright sx={{ mb: 2 }} />
           </Container>
         </Box>
       </Box>

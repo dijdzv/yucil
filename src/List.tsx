@@ -1,84 +1,104 @@
 import { useState } from 'react';
-import {
-  Box,
-  List as MuiList,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  Divider,
-} from '@mui/material';
-import { Inbox as InboxIcon, Drafts as DraftsIcon } from '@mui/icons-material';
+import { Box, List as MuiList, ListSubheader, Divider } from '@mui/material';
 import {
   DragDropContext,
   Droppable,
   Draggable,
-  DropResult,
+  type DropResult,
+  type DraggableProvided,
+  type DraggableStateSnapshot,
+  type DraggableRubric,
 } from 'react-beautiful-dnd';
+import Item from './Item';
 
-function List() {
-  const [rows, setRows] = useState([
-    { name: 'item1', index: 0, order: 0 },
-    { name: 'item2', index: 1, order: 1 },
-    { name: 'item3', index: 2, order: 2 },
-    { name: 'item4', index: 3, order: 3 },
-    { name: 'item5', index: 4, order: 4 },
-  ]);
+const getRenderItem =
+  (list: Array<any>) =>
+  (
+    provided: DraggableProvided,
+    snapshot: DraggableStateSnapshot,
+    rubric: DraggableRubric
+  ) =>
+    (
+      <Item
+        innerRef={provided.innerRef}
+        provided={provided}
+        name={list[rubric.source.index].name}
+        isDragging={snapshot.isDragging}
+      />
+    );
+
+function List(props: any) {
+  const { listName, len } = props;
+
+  const initialList = [];
+  for (let i = 0; i < 5; i++) {
+    const now = new Date().getTime();
+    initialList.push({
+      name: 'item' + (i + 1),
+      uid: now + i,
+      order: i,
+    });
+  }
+
+  const [list, setList] = useState(initialList);
+
+  const renderItem = getRenderItem(list);
 
   const reorder = (startIndex: number, endIndex: number) => {
-    const result = Array.from(rows);
+    const result = list;
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
-    result.map((row, index) => (row.order = index));
+    // result.map((item, index) => (item.order = index));
     return result;
   };
 
   const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
+    const { source, destination, draggableId } = result;
     if (!destination) {
       return;
     }
+    // if (
+    //   destination.droppableId === source.droppableId &&
+    //   destination.index === source.index
+    // ) {
+    //   return;
+    // }
     const update = reorder(source.index, destination.index);
-    setRows(update);
+    setList(update);
   };
 
   return (
     <MuiList
-      sx={{ width: '100%', maxWidth: '30%', bgcolor: 'background.paper' }}
-      subheader={<ListSubheader>Settings</ListSubheader>}
+      sx={{
+        width: '100%',
+        maxWidth: `${100 / (len + 1)}%`,
+        height: '100%',
+        bgcolor: 'background.paper',
+      }}
+      subheader={<ListSubheader>{listName}</ListSubheader>}
     >
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId={'dndList'}>
+        <Droppable
+          droppableId="musicList"
+          renderClone={renderItem}
+          mode="virtual"
+        >
           {(provided) => (
-            <Box ref={provided.innerRef} {...provided.droppableProps}>
-              {rows.map((row, index) => (
-                <>
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              {list.map((item, index) => (
+                <Box sx={{ height: '3rem' }} key={item.uid}>
                   <Divider />
                   <Draggable
-                    draggableId={row.name}
+                    draggableId={item.uid.toString(16)}
                     index={index}
-                    key={row.name}
+                    key={item.uid}
                   >
-                    {(provided) => (
-                      <ListItem
-                        disablePadding
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        <ListItemButton>
-                          <ListItemIcon>
-                            <InboxIcon />
-                          </ListItemIcon>
-                          <ListItemText primary={row.name} />
-                        </ListItemButton>
-                      </ListItem>
-                    )}
+                    {renderItem}
                   </Draggable>
-                </>
+                  <Divider />
+                </Box>
               ))}
-            </Box>
+            </div>
           )}
         </Droppable>
       </DragDropContext>
@@ -87,10 +107,15 @@ function List() {
 }
 
 export default function Lists() {
+  const playlist = ['list-1', 'list-2', 'list-3'];
+
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
-      <List />
-      <List />
+    <Box
+      sx={{ display: 'flex', justifyContent: 'space-evenly', height: '90%' }}
+    >
+      {playlist.map((listName, _, array) => (
+        <List listName={listName} len={array.length} key={listName} />
+      ))}
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   Badge,
@@ -9,7 +9,6 @@ import {
   IconButton,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 
@@ -63,8 +62,8 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-function Bar(props: any) {
-  const [open, setOpen] = useState(true);
+function Bar() {
+  const [open, setOpen] = useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -96,7 +95,7 @@ function Bar(props: any) {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            YUCIL
+            {/* YUCIL */}
           </Typography>
           {/* <IconButton color="inherit">
           <Badge badgeContent={4} color="secondary">
