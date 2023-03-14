@@ -1,45 +1,11 @@
 import { useMemo, useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {
-  Box,
-  CssBaseline,
-  Container,
-  Grid,
-  Link,
-  Paper,
-  Typography,
-  Toolbar,
-} from '@mui/material';
+import { Box, CssBaseline, Container, Grid, Paper, Typography, Toolbar } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ReactPlayer from 'react-player/youtube';
-import { getName, getVersion } from '@tauri-apps/api/app';
 import { Bar } from './Bar';
 import Lists from './List';
-
-const appName = await getName();
-const appVersion = await getVersion();
-
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {'Copyright © '}
-      <Link
-        color="inherit"
-        href="https://github.com/dijdzv/yucil"
-        target="_blank"
-      >
-        {appName + ' v' + appVersion}
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { UrlPlayer, MusicPlayer } from './Player';
 
 export default function DashboardContent() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -55,8 +21,7 @@ export default function DashboardContent() {
   const [url, setUrl] = useState('');
   useEffect(() => {
     (async () => {
-      const url =
-        'https://www.youtube.com/watch?v=XPUN-w543bc&list=RDXPUN-w543bc&start_radio=1';
+      const url = 'https://www.youtube.com/playlist?list=PLT9jUIZQ61i7Tf3t1ai7RqdXLSYFJiPUJ';
       setUrl(url);
     })();
   });
@@ -70,9 +35,7 @@ export default function DashboardContent() {
           component="main"
           sx={{
             backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
+              theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
             flexGrow: 1,
             height: '100vh',
             overflow: 'hidden',
@@ -88,7 +51,10 @@ export default function DashboardContent() {
               justifyContent: 'space-between',
             }}
           >
-            <ReactPlayer url={url} controls={true} loop={true} />
+            <Box display="flex">
+              <MusicPlayer url={url} />
+              <UrlPlayer />
+            </Box>
             <Lists />
 
             {/* <Grid container spacing={3}>
@@ -125,7 +91,6 @@ export default function DashboardContent() {
                 </Paper>
               </Grid>
                 </Grid> */}
-            <Copyright sx={{ mb: 2 }} />
           </Container>
         </Box>
       </Box>

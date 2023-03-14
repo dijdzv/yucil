@@ -7,10 +7,12 @@ import {
   Typography,
   Drawer as MuiDrawer,
   IconButton,
+  Link,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import { getName, getVersion } from '@tauri-apps/api/app';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -62,6 +64,33 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
+const appName = await getName();
+const appVersion = await getVersion();
+
+function Copyright(props: any) {
+  return (
+    <Typography
+      component="h1"
+      variant="body2"
+      color="#ffc131"
+      align="right"
+      {...props}
+    >
+      {/* {'Copyright © '} */}
+      <Link
+        color="#67d6ed"
+        href="https://github.com/dijdzv/yucil"
+        target="_blank"
+        sx={{ textDecoration: 'none' }}
+      >
+        {appName + ' v' + appVersion}
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
+
 function Bar() {
   const [open, setOpen] = useState(false);
   const toggleDrawer = () => {
@@ -95,7 +124,7 @@ function Bar() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            {/* YUCIL */}
+            <Copyright sx={{}} />
           </Typography>
           {/* <IconButton color="inherit">
           <Badge badgeContent={4} color="secondary">
