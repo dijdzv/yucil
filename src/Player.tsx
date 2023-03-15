@@ -71,15 +71,20 @@ function MusicPlayer(props: any) {
       });
     }, 500);
   };
-
   const stopTimer = () => {
     clearInterval(intervalRef.current);
     intervalRef.current = null;
   };
 
+  const [title, setTitle] = useState<string | null | undefined>();
+  const getTitle = () => {
+    setTitle(document.querySelector('#music-player')?.querySelector('iframe')?.getAttribute('title'));
+  };
+
   return (
     <Box sx={{ width: '50%', border: '1px solid #555', borderRadius: 1 }}>
       <ReactPlayer
+        id="music-player"
         ref={ref}
         url={url}
         playing={playing}
@@ -87,35 +92,47 @@ function MusicPlayer(props: any) {
         volume={volume}
         muted={muted}
         controls={false}
-        width={'100%'}
-        height={250}
-        onPlay={startTimer}
+        width={0}
+        height={0}
+        onPlay={() => (startTimer(), getTitle())}
         onEnded={stopTimer}
         onPause={stopTimer}
       />
-      <Slider
-        size="small"
-        color="primary"
-        value={time.current}
-        min={0}
-        max={time.duration}
-        onChange={(_, value) => ref.current?.seekTo(value as number)}
-      />
-      <Toolbar disableGutters={true}>
+      <Toolbar>
+        <Typography component="h1" variant="h6" color="inherit" noWrap width="80%">
+          {title}
+        </Typography>
+        <Typography variant="caption" noWrap sx={{ opacity: '0.8' }}>
+          {timeToMinute(time.current)} / {timeToMinute(time.duration)}
+        </Typography>
+      </Toolbar>
+      <Toolbar>
+        <Slider
+          size="medium"
+          color="primary"
+          value={time.current}
+          min={0}
+          max={time.duration}
+          onChange={(_, value) => ref.current?.seekTo(value as number)}
+        />
+      </Toolbar>
+      <Toolbar>
         <IconButton onClick={() => setLoop(!loop)}>
-          <RepeatIcon sx={opacity(loop)} />
+          <RepeatIcon sx={opacity(loop)} fontSize="large" />
         </IconButton>
         <IconButton onClick={() => ref.current?.seekTo(0, 'fraction')}>
-          <ReplayIcon />
+          <ReplayIcon fontSize="large" />
         </IconButton>
-        <IconButton onClick={() => setPlaying(!playing)}>{playing ? <PauseIcon /> : <PlayArrowIcon />}</IconButton>
+        <IconButton onClick={() => setPlaying(!playing)}>
+          {playing ? <PauseIcon fontSize="large" /> : <PlayArrowIcon fontSize="large" />}
+        </IconButton>
         <IconButton onClick={() => ref.current?.seekTo(1, 'fraction')}>
-          <SkipNextIcon />
+          <SkipNextIcon fontSize="large" />
         </IconButton>
         <IconButton onClick={() => setMuted(!muted)}>
-          {(muted || volume === 0) && <VolumeOffIcon />}
-          {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon />}
-          {!muted && volume >= 0.5 && <VolumeUpIcon />}
+          {(muted || volume === 0) && <VolumeOffIcon fontSize="large" />}
+          {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon fontSize="large" />}
+          {!muted && volume >= 0.5 && <VolumeUpIcon fontSize="large" />}
         </IconButton>
         <Slider
           size="small"
@@ -129,28 +146,25 @@ function MusicPlayer(props: any) {
           }}
         />
       </Toolbar>
-      <Toolbar disableGutters={true}>
-        <IconButton onClick={() => ref.current?.seekTo(time.current - 5)}>
-          <Replay5Icon />
+      <Toolbar>
+        <IconButton onClick={() => ref.current?.seekTo(time.current - 30)} sx={{ flexGrow: 1 }}>
+          <Replay30Icon fontSize="large" />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current - 10)}>
-          <Replay10Icon />
+        <IconButton onClick={() => ref.current?.seekTo(time.current - 10)} sx={{ flexGrow: 1 }}>
+          <Replay10Icon fontSize="large" />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current - 30)}>
-          <Replay30Icon />
+        <IconButton onClick={() => ref.current?.seekTo(time.current - 5)} sx={{ flexGrow: 1 }}>
+          <Replay5Icon fontSize="large" />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current + 5)}>
-          <Forward5Icon />
+        <IconButton onClick={() => ref.current?.seekTo(time.current + 5)} sx={{ flexGrow: 1 }}>
+          <Forward5Icon fontSize="large" />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current + 10)}>
-          <Forward10Icon />
+        <IconButton onClick={() => ref.current?.seekTo(time.current + 10)} sx={{ flexGrow: 1 }}>
+          <Forward10Icon fontSize="large" />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current + 30)}>
-          <Forward30Icon />
+        <IconButton onClick={() => ref.current?.seekTo(time.current + 30)} sx={{ flexGrow: 1 }}>
+          <Forward30Icon fontSize="large" />
         </IconButton>
-        <Typography sx={{ fontSize: '0.75rem', opacity: '0.8' }}>
-          {timeToMinute(time.current)} / {timeToMinute(time.duration)}
-        </Typography>
       </Toolbar>
     </Box>
   );
