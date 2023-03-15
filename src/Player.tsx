@@ -16,7 +16,6 @@ import Forward30Icon from '@mui/icons-material/Forward30';
 import Replay5Icon from '@mui/icons-material/Replay5';
 import Replay10Icon from '@mui/icons-material/Replay10';
 import Replay30Icon from '@mui/icons-material/Replay30';
-import { display } from '@mui/system';
 
 function UrlPlayer() {
   const [url, setUrl] = useState<Array<string>>([]);
@@ -45,7 +44,7 @@ function MusicPlayer(props: any) {
   const [playing, setPlaying] = useState(true);
   const [loop, setLoop] = useState(true);
   const [volume, setVolume] = useState(0.3);
-  const [openVolume, setOpenVolume] = useState(true);
+  const [muted, setMuted] = useState(false);
   const ref = useRef<ReactPlayer>(null);
   const opacity = (condition: boolean): object => ({
     opacity: condition ? 1 : 0.3,
@@ -86,6 +85,7 @@ function MusicPlayer(props: any) {
         playing={playing}
         loop={loop}
         volume={volume}
+        muted={muted}
         controls={false}
         width={'100%'}
         height={250}
@@ -112,24 +112,22 @@ function MusicPlayer(props: any) {
         <IconButton onClick={() => ref.current?.seekTo(1, 'fraction')}>
           <SkipNextIcon />
         </IconButton>
-        <IconButton onClick={() => setOpenVolume(!openVolume)}>
-          {volume === 0 && <VolumeOffIcon sx={opacity(openVolume)} />}
-          {volume > 0 && volume < 0.5 && <VolumeDownIcon sx={opacity(openVolume)} />}
-          {volume >= 0.5 && <VolumeUpIcon sx={opacity(openVolume)} />}
+        <IconButton onClick={() => setMuted(!muted)}>
+          {(muted || volume === 0) && <VolumeOffIcon />}
+          {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon />}
+          {!muted && volume >= 0.5 && <VolumeUpIcon />}
         </IconButton>
-        {openVolume && (
-          <Slider
-            size="small"
-            color="secondary"
-            value={volume}
-            min={0}
-            step={0.01}
-            max={1}
-            onChange={(_, value) => {
-              setVolume(value as number);
-            }}
-          />
-        )}
+        <Slider
+          size="small"
+          color="secondary"
+          value={volume}
+          min={0}
+          step={0.01}
+          max={1}
+          onChange={(_, value) => {
+            setVolume(value as number);
+          }}
+        />
       </Toolbar>
       <Toolbar disableGutters={true}>
         <IconButton onClick={() => ref.current?.seekTo(time.current - 5)}>
