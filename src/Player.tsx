@@ -45,36 +45,27 @@ function UrlPlayer() {
 function MusicPlayer(props: any) {
   //? playlistをapiから取得してきたplaylistから動画単体ずつで制御する
   const { url } = props;
+
   const [playing, setPlaying] = useState(true);
   const [loop, setLoop] = useState(true);
-  // const [oneLoop, setOneLoop] = useState(false);
-  // const toBeginMusic = (condition: boolean, player: ReactPlayer | null) => {
-  //   if (condition) {
-  //     const p = player?.getInternalPlayer('player');
-  //     p?.previousVideo();
-  //     console.log(p);
-  //   }
-  // };
+  const [oneLoop, setOneLoop] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [muted, setMuted] = useState(false);
+  const [time, setTime] = useState({ current: 0, duration: 0 });
+  const [title, setTitle] = useState<string | null | undefined>();
+  const [shuffle, setShuffle] = useState(false);
+
+  const intervalRef = useRef<any>(null);
   const ref = useRef<ReactPlayer>(null);
+
   const opacity = (condition: boolean): object => ({
     opacity: condition ? 1 : 0.3,
   });
 
-  const initialTime = {
-    current: 0,
-    duration: 0,
-  };
-  interface Time {
-    current: number;
-    duration: number;
-  }
-  const [time, setTime] = useState<Time>(initialTime);
   const timeToMinute = (time: number): string => {
     return Math.floor(time / 60) + ':' + ('00' + Math.floor(time % 60)).slice(-2);
   };
-  const intervalRef = useRef<any>(null);
+
   const startTimer = () => {
     intervalRef.current = setInterval(() => {
       setTime({
@@ -88,15 +79,65 @@ function MusicPlayer(props: any) {
     intervalRef.current = null;
   };
 
-  const [title, setTitle] = useState<string | null | undefined>();
-  const getTitle = () => {
+  const handleTitle = () => {
     setTitle(document.querySelector('#music-player')?.querySelector('iframe')?.getAttribute('title'));
   };
 
-  const [shuffle, setShuffle] = useState(false);
-  const handleShuffle = (player: ReactPlayer | null, shuffle: boolean) => {
-    player?.getInternalPlayer().setShuffle(!shuffle);
-    setShuffle(!shuffle);
+  const handleOnPlay = () => {
+    startTimer();
+    handleTitle();
+  };
+
+  const handleOnEnded = () => {
+    stopTimer();
+  };
+
+  const handleOnPause = () => {
+    stopTimer();
+  };
+
+  const handleTime = (value: number) => {
+    ref.current?.seekTo(value);
+    handlePlaying(true);
+  };
+
+  const handleLoop = () => {
+    setLoop((prev) => !prev);
+  };
+
+  const handleOneLoop = () => {
+    setOneLoop((prev) => !prev);
+  };
+
+  const handleShuffle = () => {
+    ref.current?.getInternalPlayer().setShuffle(!shuffle);
+    setShuffle((prev) => !prev);
+  };
+
+  const handleReplay = () => {
+    ref.current?.seekTo(0, 'fraction');
+  };
+
+  const handlePrevious = () => {
+    ref.current?.getInternalPlayer().previousVideo();
+    handlePlaying(true);
+  };
+
+  const handleNext = () => {
+    ref.current?.getInternalPlayer().nextVideo();
+    handlePlaying(true);
+  };
+
+  const handlePlaying = (playing?: boolean) => {
+    playing ? setPlaying(playing) : setPlaying((prev) => !prev);
+  };
+
+  const handelMuted = () => {
+    setMuted((prev) => !prev);
+  };
+
+  const handleVolume = (value: number) => {
+    setVolume(value);
   };
 
   return (
@@ -112,12 +153,9 @@ function MusicPlayer(props: any) {
         controls={false}
         width={0}
         height={0}
-        onPlay={() => (startTimer(), getTitle())}
-        onEnded={
-          () => stopTimer()
-          // , toBeginMusic(oneLoop, ref?.current)
-        }
-        onPause={stopTimer}
+        onPlay={handleOnPlay}
+        onEnded={handleOnEnded}
+        onPause={handleOnPause}
       />
       <Toolbar>
         <Typography component="h1" variant="h6" color="inherit" noWrap width="80%">
@@ -129,45 +167,37 @@ function MusicPlayer(props: any) {
       </Toolbar>
       <Toolbar>
         <Slider
-          size="medium"
           color="primary"
           value={time.current}
           min={0}
           max={time.duration}
-          onChange={(_, value) => ref.current?.seekTo(value as number)}
+          onChange={(_, value) => handleTime(value as number)}
         />
       </Toolbar>
       <Toolbar>
-        <IconButton onClick={() => setLoop(!loop)}>
-          <RepeatIcon sx={opacity(loop)} fontSize="large" />
+        <IconButton onClick={handleLoop}>
+          <RepeatIcon sx={opacity(loop)} />
         </IconButton>
-        <IconButton onClick={() => handleShuffle(ref.current, shuffle)}>
-          <ShuffleIcon sx={opacity(shuffle)} fontSize="large" />
+        <IconButton onClick={handleOneLoop}>
+          <RepeatOneIcon sx={opacity(oneLoop)} />
         </IconButton>
-
-        {/* <IconButton onClick={() => setOneLoop(!oneLoop)}>
-          <RepeatOneIcon sx={opacity(oneLoop)} fontSize="large" />
-        </IconButton> */}
-        <IconButton onClick={() => ref.current?.seekTo(0, 'fraction')}>
-          <ReplayIcon fontSize="large" />
+        <IconButton onClick={() => handleShuffle()}>
+          <ShuffleIcon sx={opacity(shuffle)} />
         </IconButton>
-        <IconButton
-          onClick={() => {
-            ref.current?.getInternalPlayer().previousVideo();
-          }}
-        >
-          <SkipPreviousIcon fontSize="large" />
+        <IconButton onClick={() => handleReplay()}>
+          <ReplayIcon />
         </IconButton>
-        <IconButton onClick={() => setPlaying(!playing)}>
-          {playing ? <PauseIcon fontSize="large" /> : <PlayArrowIcon fontSize="large" />}
+        <IconButton onClick={() => handlePrevious()}>
+          <SkipPreviousIcon />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(1, 'fraction')}>
-          <SkipNextIcon fontSize="large" />
+        <IconButton onClick={() => handlePlaying()}>{playing ? <PauseIcon /> : <PlayArrowIcon />}</IconButton>
+        <IconButton onClick={() => handleNext()}>
+          <SkipNextIcon />
         </IconButton>
-        <IconButton onClick={() => setMuted(!muted)}>
-          {(muted || volume === 0) && <VolumeOffIcon fontSize="large" />}
-          {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon fontSize="large" />}
-          {!muted && volume >= 0.5 && <VolumeUpIcon fontSize="large" />}
+        <IconButton onClick={handelMuted}>
+          {(muted || volume === 0) && <VolumeOffIcon />}
+          {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon />}
+          {!muted && volume >= 0.5 && <VolumeUpIcon />}
         </IconButton>
         <Slider
           size="small"
@@ -176,29 +206,27 @@ function MusicPlayer(props: any) {
           min={0}
           step={0.01}
           max={1}
-          onChange={(_, value) => {
-            setVolume(value as number);
-          }}
+          onChange={(_, value) => handleVolume(value as number)}
         />
       </Toolbar>
       <Toolbar>
-        <IconButton onClick={() => ref.current?.seekTo(time.current - 30)} sx={{ flexGrow: 1 }}>
-          <Replay30Icon fontSize="large" />
+        <IconButton onClick={() => handleTime(time.current - 30)} sx={{ flexGrow: 1 }}>
+          <Replay30Icon />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current - 10)} sx={{ flexGrow: 1 }}>
-          <Replay10Icon fontSize="large" />
+        <IconButton onClick={() => handleTime(time.current - 10)} sx={{ flexGrow: 1 }}>
+          <Replay10Icon />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current - 5)} sx={{ flexGrow: 1 }}>
-          <Replay5Icon fontSize="large" />
+        <IconButton onClick={() => handleTime(time.current - 5)} sx={{ flexGrow: 1 }}>
+          <Replay5Icon />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current + 5)} sx={{ flexGrow: 1 }}>
-          <Forward5Icon fontSize="large" />
+        <IconButton onClick={() => handleTime(time.current + 5)} sx={{ flexGrow: 1 }}>
+          <Forward5Icon />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current + 10)} sx={{ flexGrow: 1 }}>
-          <Forward10Icon fontSize="large" />
+        <IconButton onClick={() => handleTime(time.current + 10)} sx={{ flexGrow: 1 }}>
+          <Forward10Icon />
         </IconButton>
-        <IconButton onClick={() => ref.current?.seekTo(time.current + 30)} sx={{ flexGrow: 1 }}>
-          <Forward30Icon fontSize="large" />
+        <IconButton onClick={() => handleTime(time.current + 30)} sx={{ flexGrow: 1 }}>
+          <Forward30Icon />
         </IconButton>
       </Toolbar>
     </Box>
