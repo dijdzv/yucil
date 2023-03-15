@@ -89,7 +89,6 @@ function MusicPlayer(props: any) {
   };
 
   const handleOnProgress = (progress: OnProgressProps) => {
-    console.log(progress);
     oneLoop && progress.played > 0.99 && handleReplay();
   };
 
@@ -147,7 +146,7 @@ function MusicPlayer(props: any) {
   };
 
   return (
-    <Box sx={{ width: '50%', border: '1px solid #555', borderRadius: 1 }}>
+    <Box sx={{ width: '50%', border: '1px solid #555', borderRadius: 1, display: 'flex', flexDirection: 'column' }}>
       <ReactPlayer
         id="music-player"
         ref={ref}
@@ -164,7 +163,7 @@ function MusicPlayer(props: any) {
         onPause={handleOnPause}
         onProgress={(progress) => handleOnProgress(progress)}
       />
-      <Toolbar>
+      <Toolbar sx={{ flexGrow: 1 }}>
         <Typography component="h1" variant="h6" color="inherit" noWrap width="80%">
           {title}
         </Typography>
@@ -172,40 +171,15 @@ function MusicPlayer(props: any) {
           {timeToMinute(time.current)} / {timeToMinute(time.duration)}
         </Typography>
       </Toolbar>
-      <Toolbar>
+      <Toolbar sx={{ flexDirection: 'column', flexGrow: 1 }}>
         <Slider
           color="primary"
           value={time.current}
           min={0}
           max={time.duration}
           onChange={(_, value) => handleTime(value as number)}
+          sx={{ flexGrow: 1 }}
         />
-      </Toolbar>
-      <Toolbar>
-        <IconButton onClick={handleLoop}>
-          <RepeatIcon sx={opacity(loop)} />
-        </IconButton>
-        <IconButton onClick={handleOneLoop}>
-          <RepeatOneIcon sx={opacity(oneLoop)} />
-        </IconButton>
-        <IconButton onClick={() => handleShuffle()}>
-          <ShuffleIcon sx={opacity(shuffle)} />
-        </IconButton>
-        <IconButton onClick={() => handleReplay()}>
-          <ReplayIcon />
-        </IconButton>
-        <IconButton onClick={() => handlePrevious()}>
-          <SkipPreviousIcon />
-        </IconButton>
-        <IconButton onClick={() => handlePlaying()}>{playing ? <PauseIcon /> : <PlayArrowIcon />}</IconButton>
-        <IconButton onClick={() => handleNext()}>
-          <SkipNextIcon />
-        </IconButton>
-        <IconButton onClick={handelMuted}>
-          {(muted || volume === 0) && <VolumeOffIcon />}
-          {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon />}
-          {!muted && volume >= 0.5 && <VolumeUpIcon />}
-        </IconButton>
         <Slider
           size="small"
           color="secondary"
@@ -214,27 +188,58 @@ function MusicPlayer(props: any) {
           step={0.01}
           max={1}
           onChange={(_, value) => handleVolume(value as number)}
+          sx={{ flexGrow: 1 }}
         />
       </Toolbar>
-      <Toolbar>
-        <IconButton onClick={() => handleTime(time.current - 30)} sx={{ flexGrow: 1 }}>
-          <Replay30Icon />
-        </IconButton>
-        <IconButton onClick={() => handleTime(time.current - 10)} sx={{ flexGrow: 1 }}>
-          <Replay10Icon />
-        </IconButton>
-        <IconButton onClick={() => handleTime(time.current - 5)} sx={{ flexGrow: 1 }}>
-          <Replay5Icon />
-        </IconButton>
-        <IconButton onClick={() => handleTime(time.current + 5)} sx={{ flexGrow: 1 }}>
-          <Forward5Icon />
-        </IconButton>
-        <IconButton onClick={() => handleTime(time.current + 10)} sx={{ flexGrow: 1 }}>
-          <Forward10Icon />
-        </IconButton>
-        <IconButton onClick={() => handleTime(time.current + 30)} sx={{ flexGrow: 1 }}>
-          <Forward30Icon />
-        </IconButton>
+      <Toolbar disableGutters={true} sx={{ flexDirection: 'column', height: '80px', flexGrow: 1 }}>
+        <Box width={'90%'} display={'flex'} flexGrow={1}>
+          <IconButton onClick={handleLoop} sx={{ flexGrow: 1, p: 0 }}>
+            <RepeatIcon sx={opacity(loop)} />
+          </IconButton>
+          <IconButton onClick={handleOneLoop} sx={{ flexGrow: 1, p: 0 }}>
+            <RepeatOneIcon sx={opacity(oneLoop)} />
+          </IconButton>
+          <IconButton onClick={() => handleShuffle()} sx={{ flexGrow: 1, p: 0 }}>
+            <ShuffleIcon sx={opacity(shuffle)} />
+          </IconButton>
+          <IconButton onClick={() => handleReplay()} sx={{ flexGrow: 1, p: 0 }}>
+            <ReplayIcon />
+          </IconButton>
+          <IconButton onClick={() => handlePrevious()} sx={{ flexGrow: 1, p: 0 }}>
+            <SkipPreviousIcon />
+          </IconButton>
+          <IconButton onClick={() => handlePlaying()} sx={{ flexGrow: 1, p: 0 }}>
+            {playing ? <PauseIcon /> : <PlayArrowIcon />}
+          </IconButton>
+          <IconButton onClick={() => handleNext()} sx={{ flexGrow: 1, p: 0 }}>
+            <SkipNextIcon />
+          </IconButton>
+          <IconButton onClick={handelMuted} sx={{ flexGrow: 1, p: 0 }}>
+            {(muted || volume === 0) && <VolumeOffIcon />}
+            {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon />}
+            {!muted && volume >= 0.5 && <VolumeUpIcon />}
+          </IconButton>
+        </Box>
+        <Box width={'90%'} display={'flex'} flexGrow={1}>
+          <IconButton onClick={() => handleTime(time.current - 30)} sx={{ flexGrow: 1, p: 0 }}>
+            <Replay30Icon />
+          </IconButton>
+          <IconButton onClick={() => handleTime(time.current - 10)} sx={{ flexGrow: 1, p: 0 }}>
+            <Replay10Icon />
+          </IconButton>
+          <IconButton onClick={() => handleTime(time.current - 5)} sx={{ flexGrow: 1, p: 0 }}>
+            <Replay5Icon />
+          </IconButton>
+          <IconButton onClick={() => handleTime(time.current + 5)} sx={{ flexGrow: 1, p: 0 }}>
+            <Forward5Icon />
+          </IconButton>
+          <IconButton onClick={() => handleTime(time.current + 10)} sx={{ flexGrow: 1, p: 0 }}>
+            <Forward10Icon />
+          </IconButton>
+          <IconButton onClick={() => handleTime(time.current + 30)} sx={{ flexGrow: 1, p: 0 }}>
+            <Forward30Icon />
+          </IconButton>
+        </Box>
       </Toolbar>
     </Box>
   );
