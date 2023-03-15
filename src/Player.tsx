@@ -19,6 +19,7 @@ import Replay5Icon from '@mui/icons-material/Replay5';
 import Replay10Icon from '@mui/icons-material/Replay10';
 import Replay30Icon from '@mui/icons-material/Replay30';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
+import { OnProgressProps } from 'react-player/base';
 
 function UrlPlayer() {
   const [url, setUrl] = useState<Array<string>>([]);
@@ -43,7 +44,6 @@ function UrlPlayer() {
 }
 
 function MusicPlayer(props: any) {
-  //? playlistをapiから取得してきたplaylistから動画単体ずつで制御する
   const { url } = props;
 
   const [playing, setPlaying] = useState(true);
@@ -88,16 +88,22 @@ function MusicPlayer(props: any) {
     handleTitle();
   };
 
+  const handleOnProgress = (progress: OnProgressProps) => {
+    console.log(progress);
+    oneLoop && progress.played > 0.99 && handleReplay();
+  };
+
   const handleOnEnded = () => {
     stopTimer();
+    handlePlaying();
   };
 
   const handleOnPause = () => {
     stopTimer();
   };
 
-  const handleTime = (value: number) => {
-    ref.current?.seekTo(value);
+  const handleTime = (time: number) => {
+    ref.current?.seekTo(time);
     handlePlaying(true);
   };
 
@@ -115,7 +121,7 @@ function MusicPlayer(props: any) {
   };
 
   const handleReplay = () => {
-    ref.current?.seekTo(0, 'fraction');
+    ref.current?.seekTo(0);
   };
 
   const handlePrevious = () => {
@@ -129,15 +135,15 @@ function MusicPlayer(props: any) {
   };
 
   const handlePlaying = (playing?: boolean) => {
-    playing ? setPlaying(playing) : setPlaying((prev) => !prev);
+    playing !== undefined ? setPlaying(playing) : setPlaying((prev) => !prev);
   };
 
   const handelMuted = () => {
     setMuted((prev) => !prev);
   };
 
-  const handleVolume = (value: number) => {
-    setVolume(value);
+  const handleVolume = (volume: number) => {
+    setVolume(volume);
   };
 
   return (
@@ -156,6 +162,7 @@ function MusicPlayer(props: any) {
         onPlay={handleOnPlay}
         onEnded={handleOnEnded}
         onPause={handleOnPause}
+        onProgress={(progress) => handleOnProgress(progress)}
       />
       <Toolbar>
         <Typography component="h1" variant="h6" color="inherit" noWrap width="80%">
