@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Box, IconButton, TextField, Toolbar, Slider, Typography } from '@mui/material';
 import ReactPlayer from 'react-player/youtube';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RepeatIcon from '@mui/icons-material/Repeat';
+import RepeatOneIcon from '@mui/icons-material/RepeatOne';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeDownIcon from '@mui/icons-material/VolumeDown';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import ReplayIcon from '@mui/icons-material/Replay';
 import Forward5Icon from '@mui/icons-material/Forward5';
@@ -16,6 +18,7 @@ import Forward30Icon from '@mui/icons-material/Forward30';
 import Replay5Icon from '@mui/icons-material/Replay5';
 import Replay10Icon from '@mui/icons-material/Replay10';
 import Replay30Icon from '@mui/icons-material/Replay30';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
 
 function UrlPlayer() {
   const [url, setUrl] = useState<Array<string>>([]);
@@ -40,9 +43,18 @@ function UrlPlayer() {
 }
 
 function MusicPlayer(props: any) {
+  //? playlistをapiから取得してきたplaylistから動画単体ずつで制御する
   const { url } = props;
   const [playing, setPlaying] = useState(true);
   const [loop, setLoop] = useState(true);
+  // const [oneLoop, setOneLoop] = useState(false);
+  // const toBeginMusic = (condition: boolean, player: ReactPlayer | null) => {
+  //   if (condition) {
+  //     const p = player?.getInternalPlayer('player');
+  //     p?.previousVideo();
+  //     console.log(p);
+  //   }
+  // };
   const [volume, setVolume] = useState(0.3);
   const [muted, setMuted] = useState(false);
   const ref = useRef<ReactPlayer>(null);
@@ -81,6 +93,12 @@ function MusicPlayer(props: any) {
     setTitle(document.querySelector('#music-player')?.querySelector('iframe')?.getAttribute('title'));
   };
 
+  const [shuffle, setShuffle] = useState(false);
+  const handleShuffle = (player: ReactPlayer | null, shuffle: boolean) => {
+    player?.getInternalPlayer().setShuffle(!shuffle);
+    setShuffle(!shuffle);
+  };
+
   return (
     <Box sx={{ width: '50%', border: '1px solid #555', borderRadius: 1 }}>
       <ReactPlayer
@@ -95,7 +113,10 @@ function MusicPlayer(props: any) {
         width={0}
         height={0}
         onPlay={() => (startTimer(), getTitle())}
-        onEnded={stopTimer}
+        onEnded={
+          () => stopTimer()
+          // , toBeginMusic(oneLoop, ref?.current)
+        }
         onPause={stopTimer}
       />
       <Toolbar>
@@ -120,8 +141,22 @@ function MusicPlayer(props: any) {
         <IconButton onClick={() => setLoop(!loop)}>
           <RepeatIcon sx={opacity(loop)} fontSize="large" />
         </IconButton>
+        <IconButton onClick={() => handleShuffle(ref.current, shuffle)}>
+          <ShuffleIcon sx={opacity(shuffle)} fontSize="large" />
+        </IconButton>
+
+        {/* <IconButton onClick={() => setOneLoop(!oneLoop)}>
+          <RepeatOneIcon sx={opacity(oneLoop)} fontSize="large" />
+        </IconButton> */}
         <IconButton onClick={() => ref.current?.seekTo(0, 'fraction')}>
           <ReplayIcon fontSize="large" />
+        </IconButton>
+        <IconButton
+          onClick={() => {
+            ref.current?.getInternalPlayer().previousVideo();
+          }}
+        >
+          <SkipPreviousIcon fontSize="large" />
         </IconButton>
         <IconButton onClick={() => setPlaying(!playing)}>
           {playing ? <PauseIcon fontSize="large" /> : <PlayArrowIcon fontSize="large" />}
