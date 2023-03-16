@@ -1,9 +1,9 @@
 import { useMemo, useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, CssBaseline, Container, Grid, Paper, Typography, Toolbar } from '@mui/material';
+import { Box, CssBaseline, Container } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import GridLayout from 'react-grid-layout';
-import { Bar } from './Bar';
+import Bar from './Bar';
 import Lists from './List';
 import { UrlPlayer, MusicPlayer } from './Player';
 
@@ -45,10 +45,6 @@ export default function DashboardContent() {
             maxWidth="lg"
             sx={{
               mt: '6rem',
-              height: 'calc(100% - 6rem)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
             }}
           >
             <Box display="flex">

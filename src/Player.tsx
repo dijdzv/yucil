@@ -21,7 +21,7 @@ import Replay30Icon from '@mui/icons-material/Replay30';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { OnProgressProps } from 'react-player/base';
 
-function UrlPlayer() {
+export function UrlPlayer() {
   const [url, setUrl] = useState<Array<string>>([]);
 
   return (
@@ -43,7 +43,7 @@ function UrlPlayer() {
   );
 }
 
-function MusicPlayer(props: any) {
+export function MusicPlayer(props: any) {
   const { url } = props;
 
   const [playing, setPlaying] = useState(true);
@@ -244,5 +244,3 @@ function MusicPlayer(props: any) {
     </Box>
   );
 }
-
-export { UrlPlayer, MusicPlayer };

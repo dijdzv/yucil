@@ -72,7 +72,7 @@ function Copyright(props: any) {
   );
 }
 
-function Bar() {
+export default function Bar() {
   const [open, setOpen] = useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -98,5 +98,3 @@ function Bar() {
     </>
   );
 }
-
-export { Bar };
