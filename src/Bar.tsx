@@ -61,9 +61,9 @@ const appVersion = await getVersion();
 
 function Copyright(props: any) {
   return (
-    <Typography component="h1" variant="body2" color="#ffc131" align="right" {...props}>
+    <Typography component="h1" variant="body2" className="yucil-2" align="right" {...props}>
       {/* {'Copyright © '} */}
-      <Link color="#67d6ed" href="https://github.com/dijdzv/yucil" target="_blank" sx={{ textDecoration: 'none' }}>
+      <Link className="yucil-1" href="https://github.com/dijdzv/yucil" target="_blank" sx={{ textDecoration: 'none' }}>
         {appName + ' v' + appVersion}
       </Link>{' '}
       {new Date().getFullYear()}
@@ -80,7 +80,7 @@ function Bar() {
 
   return (
     <>
-      <AppBar position="absolute" open={open}>
+      <AppBar position="absolute" open={open} sx={{ backgroundColor: '#000' }}>
         <Toolbar>
           <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
             <Copyright sx={{}} />

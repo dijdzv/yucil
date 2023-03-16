@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline, Container, Grid, Paper, Typography, Toolbar } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import ReactPlayer from 'react-player/youtube';
+import GridLayout from 'react-grid-layout';
 import { Bar } from './Bar';
 import Lists from './List';
 import { UrlPlayer, MusicPlayer } from './Player';
@@ -34,8 +34,8 @@ export default function DashboardContent() {
         <Box
           component="main"
           sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
+            // backgroundColor: (theme) =>
+            //   theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
             flexGrow: 1,
             height: '100vh',
             overflow: 'hidden',

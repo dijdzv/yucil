@@ -12,12 +12,7 @@ import {
 import Item from './Item';
 
 const getRenderItem =
-  (list: Array<any>) =>
-  (
-    provided: DraggableProvided,
-    snapshot: DraggableStateSnapshot,
-    rubric: DraggableRubric
-  ) =>
+  (list: Array<any>) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) =>
     (
       <Item
         innerRef={provided.innerRef}
@@ -74,25 +69,19 @@ function List(props: any) {
         maxWidth: `${100 / (len + 1)}%`,
         height: '100%',
         bgcolor: 'background.paper',
+        border: '1px solid #555',
+        borderRadius: 1,
       }}
       subheader={<ListSubheader>{listName}</ListSubheader>}
     >
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable
-          droppableId="musicList"
-          renderClone={renderItem}
-          mode="virtual"
-        >
+        <Droppable droppableId="musicList" renderClone={renderItem} mode="virtual">
           {(provided) => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
               {list.map((item, index) => (
                 <Box sx={{ height: '3rem' }} key={item.uid}>
                   <Divider />
-                  <Draggable
-                    draggableId={item.uid.toString(16)}
-                    index={index}
-                    key={item.uid}
-                  >
+                  <Draggable draggableId={item.uid.toString(16)} index={index} key={item.uid}>
                     {renderItem}
                   </Draggable>
                   <Divider />
@@ -110,9 +99,7 @@ export default function Lists() {
   const playlist = ['list-1', 'list-2', 'list-3'];
 
   return (
-    <Box
-      sx={{ display: 'flex', justifyContent: 'space-evenly', height: '90%' }}
-    >
+    <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '90%' }}>
       {playlist.map((listName, _, array) => (
         <List listName={listName} len={array.length} key={listName} />
       ))}
