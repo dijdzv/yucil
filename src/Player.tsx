@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Box, IconButton, TextField, Toolbar, Slider, Typography } from '@mui/material';
+import { Box, Card, CardHeader, CardContent, Divider, IconButton, TextField, Toolbar, Slider } from '@mui/material';
 import ReactPlayer from 'react-player/youtube';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -63,24 +63,35 @@ export function MusicPlayer(props: any) {
   });
 
   const timeToMinute = (time: number): string => {
-    return Math.floor(time / 60) + ':' + ('00' + Math.floor(time % 60)).slice(-2);
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return minutes + ':' + ('00' + seconds).slice(-2);
   };
 
   const startTimer = () => {
+    const player = ref.current;
+    const currentTime = player?.getCurrentTime() || 0;
+    const duration = player?.getDuration() || 0;
+    setTime({
+      current: currentTime,
+      duration,
+    });
     intervalRef.current = setInterval(() => {
       setTime({
-        current: ref.current?.getCurrentTime() || 0,
-        duration: ref.current?.getDuration() || 0,
+        current: player?.getCurrentTime() || 0,
+        duration: player?.getDuration() || 0,
       });
     }, 500);
   };
+
   const stopTimer = () => {
     clearInterval(intervalRef.current);
     intervalRef.current = null;
   };
 
   const handleTitle = () => {
-    setTitle(document.querySelector('#music-player')?.querySelector('iframe')?.getAttribute('title'));
+    const iframe = document.querySelector('#music-player')?.querySelector('iframe');
+    setTitle(iframe?.getAttribute('title'));
   };
 
   const handleOnPlay = () => {
@@ -146,7 +157,7 @@ export function MusicPlayer(props: any) {
   };
 
   return (
-    <Box sx={{ width: '50%', border: '1px solid #555', borderRadius: 1, display: 'flex', flexDirection: 'column' }}>
+    <Card variant="outlined" sx={{ width: '50%', display: 'flex', flexDirection: 'column' }}>
       <ReactPlayer
         id="music-player"
         ref={ref}
@@ -163,84 +174,86 @@ export function MusicPlayer(props: any) {
         onPause={handleOnPause}
         onProgress={(progress) => handleOnProgress(progress)}
       />
-      <Toolbar sx={{ flexGrow: 1 }}>
-        <Typography component="h1" variant="h6" color="inherit" noWrap width="80%">
-          {title}
-        </Typography>
-        <Typography variant="caption" noWrap sx={{ opacity: '0.8' }}>
-          {timeToMinute(time.current)} / {timeToMinute(time.duration)}
-        </Typography>
-      </Toolbar>
-      <Toolbar sx={{ flexDirection: 'column', flexGrow: 1 }}>
-        <Slider
-          color="primary"
-          value={time.current}
-          min={0}
-          max={time.duration}
-          onChange={(_, value) => handleTime(value as number)}
-          sx={{ flexGrow: 1 }}
-        />
-        <Slider
-          size="small"
-          color="secondary"
-          value={volume}
-          min={0}
-          step={0.01}
-          max={1}
-          onChange={(_, value) => handleVolume(value as number)}
-          sx={{ flexGrow: 1 }}
-        />
-      </Toolbar>
-      <Toolbar disableGutters={true} sx={{ flexDirection: 'column', height: '80px', flexGrow: 1 }}>
-        <Box width={'90%'} display={'flex'} flexGrow={1}>
-          <IconButton onClick={handleLoop} sx={{ flexGrow: 1, p: 0 }}>
-            <RepeatIcon sx={opacity(loop)} />
-          </IconButton>
-          <IconButton onClick={handleOneLoop} sx={{ flexGrow: 1, p: 0 }}>
-            <RepeatOneIcon sx={opacity(oneLoop)} />
-          </IconButton>
-          <IconButton onClick={() => handleShuffle()} sx={{ flexGrow: 1, p: 0 }}>
-            <ShuffleIcon sx={opacity(shuffle)} />
-          </IconButton>
-          <IconButton onClick={() => handleReplay()} sx={{ flexGrow: 1, p: 0 }}>
-            <ReplayIcon />
-          </IconButton>
-          <IconButton onClick={() => handlePrevious()} sx={{ flexGrow: 1, p: 0 }}>
-            <SkipPreviousIcon />
-          </IconButton>
-          <IconButton onClick={() => handlePlaying()} sx={{ flexGrow: 1, p: 0 }}>
-            {playing ? <PauseIcon /> : <PlayArrowIcon />}
-          </IconButton>
-          <IconButton onClick={() => handleNext()} sx={{ flexGrow: 1, p: 0 }}>
-            <SkipNextIcon />
-          </IconButton>
-          <IconButton onClick={handelMuted} sx={{ flexGrow: 1, p: 0 }}>
-            {(muted || volume === 0) && <VolumeOffIcon />}
-            {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon />}
-            {!muted && volume >= 0.5 && <VolumeUpIcon />}
-          </IconButton>
+      <CardHeader
+        title={title}
+        titleTypographyProps={{
+          noWrap: true,
+        }}
+        subheader={timeToMinute(time.current) + ' / ' + timeToMinute(time.duration)}
+      />
+      <Divider />
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', flexGrow: 5 }}>
+        <Box display="flex" flexDirection="column" flexGrow={1}>
+          <Slider
+            color="primary"
+            value={time.current}
+            min={0}
+            max={time.duration}
+            onChange={(_, value) => handleTime(value as number)}
+            sx={{ flexGrow: 1 }}
+          />
+          <Slider
+            size="small"
+            color="secondary"
+            value={volume}
+            min={0}
+            step={0.01}
+            max={1}
+            onChange={(_, value) => handleVolume(value as number)}
+            sx={{ flexGrow: 1 }}
+          />
         </Box>
-        <Box width={'90%'} display={'flex'} flexGrow={1}>
-          <IconButton onClick={() => handleTime(time.current - 30)} sx={{ flexGrow: 1, p: 0 }}>
-            <Replay30Icon />
-          </IconButton>
-          <IconButton onClick={() => handleTime(time.current - 10)} sx={{ flexGrow: 1, p: 0 }}>
-            <Replay10Icon />
-          </IconButton>
-          <IconButton onClick={() => handleTime(time.current - 5)} sx={{ flexGrow: 1, p: 0 }}>
-            <Replay5Icon />
-          </IconButton>
-          <IconButton onClick={() => handleTime(time.current + 5)} sx={{ flexGrow: 1, p: 0 }}>
-            <Forward5Icon />
-          </IconButton>
-          <IconButton onClick={() => handleTime(time.current + 10)} sx={{ flexGrow: 1, p: 0 }}>
-            <Forward10Icon />
-          </IconButton>
-          <IconButton onClick={() => handleTime(time.current + 30)} sx={{ flexGrow: 1, p: 0 }}>
-            <Forward30Icon />
-          </IconButton>
+        <Box display="flex" flexDirection="column" flexGrow={1}>
+          <Box display={'flex'} flexGrow={1}>
+            <IconButton onClick={handleLoop} sx={{ flexGrow: 1, p: 0 }}>
+              <RepeatIcon sx={opacity(loop)} />
+            </IconButton>
+            <IconButton onClick={handleOneLoop} sx={{ flexGrow: 1, p: 0 }}>
+              <RepeatOneIcon sx={opacity(oneLoop)} />
+            </IconButton>
+            <IconButton onClick={() => handleShuffle()} sx={{ flexGrow: 1, p: 0 }}>
+              <ShuffleIcon sx={opacity(shuffle)} />
+            </IconButton>
+            <IconButton onClick={() => handleReplay()} sx={{ flexGrow: 1, p: 0 }}>
+              <ReplayIcon />
+            </IconButton>
+            <IconButton onClick={() => handlePrevious()} sx={{ flexGrow: 1, p: 0 }}>
+              <SkipPreviousIcon />
+            </IconButton>
+            <IconButton onClick={() => handlePlaying()} sx={{ flexGrow: 1, p: 0 }}>
+              {playing ? <PauseIcon /> : <PlayArrowIcon />}
+            </IconButton>
+            <IconButton onClick={() => handleNext()} sx={{ flexGrow: 1, p: 0 }}>
+              <SkipNextIcon />
+            </IconButton>
+            <IconButton onClick={handelMuted} sx={{ flexGrow: 1, p: 0 }}>
+              {(muted || volume === 0) && <VolumeOffIcon />}
+              {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon />}
+              {!muted && volume >= 0.5 && <VolumeUpIcon />}
+            </IconButton>
+          </Box>
+          <Box display={'flex'} flexGrow={1}>
+            <IconButton onClick={() => handleTime(time.current - 30)} sx={{ flexGrow: 1, p: 0 }}>
+              <Replay30Icon />
+            </IconButton>
+            <IconButton onClick={() => handleTime(time.current - 10)} sx={{ flexGrow: 1, p: 0 }}>
+              <Replay10Icon />
+            </IconButton>
+            <IconButton onClick={() => handleTime(time.current - 5)} sx={{ flexGrow: 1, p: 0 }}>
+              <Replay5Icon />
+            </IconButton>
+            <IconButton onClick={() => handleTime(time.current + 5)} sx={{ flexGrow: 1, p: 0 }}>
+              <Forward5Icon />
+            </IconButton>
+            <IconButton onClick={() => handleTime(time.current + 10)} sx={{ flexGrow: 1, p: 0 }}>
+              <Forward10Icon />
+            </IconButton>
+            <IconButton onClick={() => handleTime(time.current + 30)} sx={{ flexGrow: 1, p: 0 }}>
+              <Forward30Icon />
+            </IconButton>
+          </Box>
         </Box>
-      </Toolbar>
-    </Box>
+      </CardContent>
+    </Card>
   );
 }
