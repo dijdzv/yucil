@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, List as MuiList, Card, CardContent, ListSubheader, Divider } from '@mui/material';
+import { Box, List as MuiList, Card, CardContent, ListSubheader } from '@mui/material';
 import {
   Droppable,
   Draggable,
@@ -23,11 +23,11 @@ const getRenderItem =
       />
     );
 
-type RowProps = {
+interface RowProps {
   data: Playlist;
   index: number;
   style: Object;
-};
+}
 
 const Row = React.memo(({ data: playlist, index, style }: RowProps) => {
   const item = playlist.items[index];
@@ -51,8 +51,12 @@ export default function List(props: any) {
   return (
     <Card variant="outlined" sx={{ height: '100%', width: 200 }}>
       <CardContent sx={{ p: 1, height: '100%' }}>
-        <MuiList subheader={<ListSubheader>{playlist.name}</ListSubheader>} sx={{ height: '100%' }}>
-          <Divider />
+        <MuiList
+          subheader={
+            <ListSubheader sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}>{playlist.name}</ListSubheader>
+          }
+          sx={{ height: '100%' }}
+        >
           <Droppable droppableId={index.toString()} renderClone={renderItem} mode="virtual">
             {(provided) => (
               <AutoSizer>
