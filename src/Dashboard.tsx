@@ -15,7 +15,7 @@ export interface Playlist {
   items: PlaylistItems;
 }
 
-export type PlaylistItems = Array<{ url: string; title: string }>;
+export type PlaylistItems = { url: string; title: string }[];
 
 export default function DashboardContent() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -35,46 +35,29 @@ export default function DashboardContent() {
       setUrl(url);
     })();
   });
-  const [playlists, setPlaylists] = useState([
-    {
-      url: '1-url',
-      name: '1-name',
-      items: [
-        {
-          url: '1-1-url',
-          title: '1-1-title',
-        },
-        {
-          url: '1-2-url',
-          title: '1-2-title',
-        },
-        {
-          url: '1-3-url',
-          title: '1-3-title',
-        },
-      ],
-    },
-    {
-      url: '2-url',
-      name: '2-name',
-      items: [
-        {
-          url: '2-1-url',
-          title: '2-1-title',
-        },
-        {
-          url: '2-2-url',
-          title: '2-2-title',
-        },
-        {
-          url: '2-3-url',
-          title: '2-3-title',
-        },
-      ],
-    },
-  ]);
 
-  const reorder = (prev: Array<Playlist>, startIndex: number, startId: number, endIndex: number, endId: number) => {
+  const initialPlaylists: { url: string; name: string; items: { url: string; title: string }[] }[] = [];
+  for (let i = 0; i < 4; i++) {
+    const playlistIndex = i + 1;
+    const playlist: { url: string; name: string; items: { url: string; title: string }[] } = {
+      url: `https://example.com/playlist${playlistIndex}`,
+      name: `Playlist ${playlistIndex}`,
+      items: [],
+    };
+
+    for (let j = 0; j < 10; j++) {
+      const itemIndex = j + 1;
+      playlist.items.push({
+        url: `https://example.com/playlist${playlistIndex}/item${itemIndex}`,
+        title: `Item ${itemIndex}`,
+      });
+    }
+
+    initialPlaylists.push(playlist);
+  }
+  const [playlists, setPlaylists] = useState(initialPlaylists);
+
+  const reorder = (prev: Playlist[], startIndex: number, startId: number, endIndex: number, endId: number) => {
     const result = prev;
     const [removed] = result[startId].items.splice(startIndex, 1);
     result[endId].items.splice(endIndex, 0, removed);
@@ -84,24 +67,25 @@ export default function DashboardContent() {
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
 
-    // ドロップ先が存在しない場合は終了
-    if (!destination) {
+    const isNotDropped = !destination;
+    if (isNotDropped) {
       return;
     }
-    // 同じ位置に移動した場合は終了
-    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+
+    const isSamePosition = source.droppableId === destination.droppableId && source.index === destination.index;
+    if (isSamePosition) {
       return;
     }
 
     if (destination.droppableId === 'trash') {
-      setPlaylists((prev) => {
+      setPlaylists((prev: Playlist[]) => {
         prev[Number(source.droppableId)].items.splice(source.index, 1);
         return prev;
       });
       return;
     }
 
-    setPlaylists((prev) =>
+    setPlaylists((prev: Playlist[]) =>
       reorder(prev, source.index, Number(source.droppableId), destination.index, Number(destination.droppableId))
     );
   };
@@ -128,7 +112,7 @@ export default function DashboardContent() {
                 {/* <UrlPlayer /> */}
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
-                {playlists.map((playlist, index) => (
+                {playlists.map((playlist: Playlist, index: number) => (
                   <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.url} />
                 ))}
               </Box>
