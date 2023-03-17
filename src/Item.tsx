@@ -1,5 +1,5 @@
-import { ListItem, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material';
-import { Inbox as InboxIcon, Drafts as DraftsIcon } from '@mui/icons-material';
+import { ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Inbox as InboxIcon } from '@mui/icons-material';
 
 export default function Item(props: any) {
   const { provided, innerRef, name, isDragging } = props;
@@ -14,7 +14,6 @@ export default function Item(props: any) {
           <ListItemText primary={name} />
         </ListItemButton>
       </ListItem>
-      {/* <Box draggable={false} sx={{ height: '3rem' }} /> */}
     </div>
   );
 }

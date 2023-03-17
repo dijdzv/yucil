@@ -4,8 +4,16 @@ import { Box, CssBaseline, Container } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import GridLayout from 'react-grid-layout';
 import Bar from './Bar';
-import Lists from './List';
+import List from './List';
 import { UrlPlayer, MusicPlayer } from './Player';
+
+export interface Playlist {
+  url: string;
+  name: string;
+  items: PlaylistItems;
+}
+
+export type PlaylistItems = Array<{ url: string; title: string }>;
 
 export default function DashboardContent() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -25,6 +33,44 @@ export default function DashboardContent() {
       setUrl(url);
     })();
   });
+  const [playlists, setPlaylists] = useState([
+    {
+      url: '1-url',
+      name: '1-name',
+      items: [
+        {
+          url: '1-1-url',
+          title: '1-1-title',
+        },
+        {
+          url: '1-2-url',
+          title: '1-2-title',
+        },
+        {
+          url: '1-3-url',
+          title: '1-3-title',
+        },
+      ],
+    },
+    {
+      url: '2-url',
+      name: '2-name',
+      items: [
+        {
+          url: '2-1-url',
+          title: '2-1-title',
+        },
+        {
+          url: '2-2-url',
+          title: '2-2-title',
+        },
+        {
+          url: '2-3-url',
+          title: '2-3-title',
+        },
+      ],
+    },
+  ]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -41,52 +87,16 @@ export default function DashboardContent() {
             overflow: 'hidden',
           }}
         >
-          <Container
-            maxWidth="lg"
-            sx={{
-              mt: '6rem',
-            }}
-          >
+          <Container maxWidth="lg" sx={{ mt: '6rem' }}>
             <Box display="flex">
-              <MusicPlayer url={url} />
+              {/* <MusicPlayer url={url} /> */}
               {/* <UrlPlayer /> */}
             </Box>
-            <Lists />
-
-            {/* <Grid container spacing={3}>
-              /* Chart
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <Chart />
-                </Paper>
-              </Grid>
-              Recent Deposits
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <Deposits />
-                </Paper>
-              </Grid>
-              Recent Orders
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
-                </Paper>
-              </Grid>
-                </Grid> */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
+              {playlists.map((playlist, index) => (
+                <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.url} />
+              ))}
+            </Box>
           </Container>
         </Box>
       </Box>

@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Box, List as MuiList, ListSubheader, Divider } from '@mui/material';
+import { Box, List as MuiList, Card, CardContent, ListSubheader, Divider } from '@mui/material';
 import {
   DragDropContext,
   Droppable,
@@ -10,99 +9,76 @@ import {
   type DraggableRubric,
 } from 'react-beautiful-dnd';
 import Item from './Item';
+import { Playlist, PlaylistItems } from './Dashboard';
+import { Dispatch, SetStateAction } from 'react';
 
 const getRenderItem =
-  (list: Array<any>) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) =>
+  (items: PlaylistItems) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) =>
     (
       <Item
         innerRef={provided.innerRef}
         provided={provided}
-        name={list[rubric.source.index].name}
+        name={items[rubric.source.index].title}
         isDragging={snapshot.isDragging}
       />
     );
 
-function List(props: any) {
-  const { listName, len } = props;
+export default function List(props: any) {
+  const playlist: Playlist = props.playlist;
+  const setPlaylists: Dispatch<SetStateAction<Array<Playlist>>> = props.setPlaylists;
+  const index = props.index;
 
-  const initialList = [];
-  for (let i = 0; i < 5; i++) {
-    const now = new Date().getTime();
-    initialList.push({
-      name: 'item' + (i + 1),
-      uid: now + i,
-      order: i,
-    });
-  }
-
-  const [list, setList] = useState(initialList);
-
-  const renderItem = getRenderItem(list);
+  const renderItem = getRenderItem(playlist.items);
 
   const reorder = (startIndex: number, endIndex: number) => {
-    const result = list;
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-    // result.map((item, index) => (item.order = index));
+    const result = playlist;
+    const [removed] = result.items.splice(startIndex, 1);
+    result.items.splice(endIndex, 0, removed);
     return result;
   };
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result;
+
+    // ドロップ先が存在しない場合は終了
     if (!destination) {
       return;
     }
-    // if (
-    //   destination.droppableId === source.droppableId &&
-    //   destination.index === source.index
-    // ) {
-    //   return;
-    // }
+    // 同じ位置に移動した場合は終了
+    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      return;
+    }
+
     const update = reorder(source.index, destination.index);
-    setList(update);
+    setPlaylists((prev) => {
+      prev[index] = update;
+      return prev;
+    });
   };
 
   return (
-    <MuiList
-      sx={{
-        width: '100%',
-        maxWidth: `${100 / (len + 1)}%`,
-        height: '100%',
-        bgcolor: 'background.paper',
-        border: '1px solid #555',
-        borderRadius: 1,
-      }}
-      subheader={<ListSubheader>{listName}</ListSubheader>}
-    >
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="musicList" renderClone={renderItem} mode="virtual">
-          {(provided) => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              {list.map((item, index) => (
-                <Box sx={{ height: '3rem' }} key={item.uid}>
-                  <Divider />
-                  <Draggable draggableId={item.uid.toString(16)} index={index} key={item.uid}>
-                    {renderItem}
-                  </Draggable>
-                  <Divider />
-                </Box>
-              ))}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </MuiList>
-  );
-}
-
-export default function Lists() {
-  const playlist = ['list-1', 'list-2', 'list-3'];
-
-  return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '90%' }}>
-      {playlist.map((listName, _, array) => (
-        <List listName={listName} len={array.length} key={listName} />
-      ))}
-    </Box>
+    <Card variant="outlined">
+      <CardContent sx={{ p: 1 }}>
+        <MuiList subheader={<ListSubheader>{playlist.name}</ListSubheader>}>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="musicList" renderClone={renderItem} mode="virtual">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {playlist.items.map((item, index) => (
+                    <Box sx={{ height: '3rem' }} key={index + item.url}>
+                      <Divider />
+                      <Draggable draggableId={index + item.url} index={index} key={index + item.url}>
+                        {renderItem}
+                      </Draggable>
+                      <Divider />
+                    </Box>
+                  ))}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </MuiList>
+      </CardContent>
+    </Card>
   );
 }

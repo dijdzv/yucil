@@ -61,7 +61,7 @@ const appVersion = await getVersion();
 
 function Copyright(props: any) {
   return (
-    <Typography component="h1" variant="body2" className="yucil-2" align="right" {...props}>
+    <Typography variant="body2" className="yucil-2" align="right" {...props}>
       {/* {'Copyright © '} */}
       <Link className="yucil-1" href="https://github.com/dijdzv/yucil" target="_blank" sx={{ textDecoration: 'none' }}>
         {appName + ' v' + appVersion}
