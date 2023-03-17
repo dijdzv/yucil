@@ -3,6 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline, Container } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import GridLayout from 'react-grid-layout';
+import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import { UrlPlayer, MusicPlayer } from './Player';
@@ -72,6 +73,31 @@ export default function DashboardContent() {
     },
   ]);
 
+  const reorder = (prev: Array<Playlist>, startIndex: number, startId: number, endIndex: number, endId: number) => {
+    const result = prev;
+    const [removed] = result[startId].items.splice(startIndex, 1);
+    result[endId].items.splice(endIndex, 0, removed);
+    return result;
+  };
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+
+    // ドロップ先が存在しない場合は終了
+    if (!destination) {
+      console.log('ドロップ先が存在しない');
+      return;
+    }
+    // 同じ位置に移動した場合は終了
+    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      return;
+    }
+
+    setPlaylists((prev) =>
+      reorder(prev, source.index, Number(source.droppableId), destination.index, Number(destination.droppableId))
+    );
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
@@ -84,19 +110,21 @@ export default function DashboardContent() {
             //   theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
             flexGrow: 1,
             height: '100vh',
-            overflow: 'hidden',
+            // overflow: 'hidden',
           }}
         >
-          <Container maxWidth="lg" sx={{ mt: '6rem' }}>
-            <Box display="flex">
-              {/* <MusicPlayer url={url} /> */}
-              {/* <UrlPlayer /> */}
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
-              {playlists.map((playlist, index) => (
-                <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.url} />
-              ))}
-            </Box>
+          <Container maxWidth="lg" sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)' }}>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Box display="flex">
+                {/* <MusicPlayer url={url} /> */}
+                {/* <UrlPlayer /> */}
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
+                {playlists.map((playlist, index) => (
+                  <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.url} />
+                ))}
+              </Box>
+            </DragDropContext>
           </Container>
         </Box>
       </Box>
