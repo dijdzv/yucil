@@ -49,7 +49,7 @@ export default function DashboardContent() {
           >
             <Box display="flex">
               <MusicPlayer url={url} />
-              <UrlPlayer />
+              {/* <UrlPlayer /> */}
             </Box>
             <Lists />
 

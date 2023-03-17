@@ -22,7 +22,7 @@ import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { OnProgressProps } from 'react-player/base';
 
 export function UrlPlayer() {
-  const [url, setUrl] = useState<Array<string>>([]);
+  const [url, setUrl] = useState<string>();
 
   return (
     <Box sx={{ width: '50%', border: '1px solid #555', borderRadius: 1 }}>
@@ -31,7 +31,7 @@ export function UrlPlayer() {
         <IconButton
           onClick={() => {
             navigator.clipboard.readText().then((clipText) => {
-              ReactPlayer.canPlay(clipText) && setUrl([...url, clipText]);
+              ReactPlayer.canPlay(clipText) && setUrl(clipText);
             });
           }}
         >
@@ -204,7 +204,7 @@ export function MusicPlayer(props: any) {
           />
         </Box>
         <Box display="flex" flexDirection="column" flexGrow={1}>
-          <Box display={'flex'} flexGrow={1}>
+          <Box display={'flex'} flexGrow={1} py={1}>
             <IconButton onClick={handleLoop} sx={{ flexGrow: 1, p: 0 }}>
               <RepeatIcon sx={opacity(loop)} />
             </IconButton>
@@ -232,7 +232,7 @@ export function MusicPlayer(props: any) {
               {!muted && volume >= 0.5 && <VolumeUpIcon />}
             </IconButton>
           </Box>
-          <Box display={'flex'} flexGrow={1}>
+          <Box display={'flex'} flexGrow={1} py={1}>
             <IconButton onClick={() => handleTime(time.current - 30)} sx={{ flexGrow: 1, p: 0 }}>
               <Replay30Icon />
             </IconButton>
