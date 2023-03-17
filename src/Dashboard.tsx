@@ -6,6 +6,7 @@ import GridLayout from 'react-grid-layout';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
+import Trash from './Trash';
 import { UrlPlayer, MusicPlayer } from './Player';
 
 export interface Playlist {
@@ -85,11 +86,18 @@ export default function DashboardContent() {
 
     // ドロップ先が存在しない場合は終了
     if (!destination) {
-      console.log('ドロップ先が存在しない');
       return;
     }
     // 同じ位置に移動した場合は終了
     if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      return;
+    }
+
+    if (destination.droppableId === 'trash') {
+      setPlaylists((prev) => {
+        prev[Number(source.droppableId)].items.splice(source.index, 1);
+        return prev;
+      });
       return;
     }
 
@@ -113,7 +121,7 @@ export default function DashboardContent() {
             // overflow: 'hidden',
           }}
         >
-          <Container maxWidth="lg" sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)' }}>
+          <Container maxWidth="lg" sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative' }}>
             <DragDropContext onDragEnd={onDragEnd}>
               <Box display="flex">
                 {/* <MusicPlayer url={url} /> */}
@@ -124,6 +132,7 @@ export default function DashboardContent() {
                   <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.url} />
                 ))}
               </Box>
+              <Trash />
             </DragDropContext>
           </Container>
         </Box>
