@@ -9,3 +9,15 @@
 .yucil-2 {
   color: #ffc131;
 }
+
+* ::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: #ffffff11;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #ffffff11;
+}

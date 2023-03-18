@@ -37,7 +37,7 @@ export default function DashboardContent() {
   });
 
   const initialPlaylists: { url: string; name: string; items: { url: string; title: string }[] }[] = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 2; i++) {
     const playlistIndex = i + 1;
     const playlist: { url: string; name: string; items: { url: string; title: string }[] } = {
       url: `https://example.com/playlist${playlistIndex}`,
@@ -105,18 +105,19 @@ export default function DashboardContent() {
             // overflow: 'hidden',
           }}
         >
-          <Container maxWidth="lg" sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative' }}>
+          <Container
+            maxWidth="lg"
+            sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
+          >
             <DragDropContext onDragEnd={onDragEnd}>
-              <Box display="flex">
-                {/* <MusicPlayer url={url} /> */}
-                {/* <UrlPlayer /> */}
-              </Box>
+              <MusicPlayer url={url} />
+              {/* <UrlPlayer /> */}
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
                   <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.url} />
                 ))}
               </Box>
-              <Trash />
+              {/* <Trash /> */}
             </DragDropContext>
           </Container>
         </Box>
