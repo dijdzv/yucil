@@ -1,8 +1,9 @@
 #![allow(unused_imports)]
 
 use google_youtube3::{chrono, hyper, hyper_rustls, oauth2, Error, FieldMask, YouTube};
+use serde_json::json;
 
-pub async fn get_youtube_playlists() -> anyhow::Result<String> {
+pub async fn get_youtube_playlists() -> anyhow::Result<serde_json::Value> {
   let secret = oauth2::read_application_secret("client_secret.json").await?;
 
   let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13,7 +14,7 @@ pub async fn get_youtube_playlists() -> anyhow::Result<String> {
   .await
   .unwrap();
 
-  let mut hub = YouTube::new(
+  let hub = YouTube::new(
     hyper::Client::builder().build(
       hyper_rustls::HttpsConnectorBuilder::new()
         .with_native_roots()
@@ -25,43 +26,17 @@ pub async fn get_youtube_playlists() -> anyhow::Result<String> {
     auth,
   );
 
-  let result = hub
-    .videos()
-    .list(&vec!["gubergren".into()])
-    .video_category_id("Lorem")
-    .region_code("gubergren")
-    .page_token("eos")
-    .on_behalf_of_content_owner("dolor")
-    .my_rating("ea")
-    .max_width(-55)
-    .max_results(13)
-    .max_height(-47)
-    .locale("duo")
-    .add_id("ipsum")
-    .hl("sed")
-    .chart("ut")
-    .doit()
-    .await;
+  let result = hub.playlists().list(&vec!["snippet".to_string()]).mine(true).doit().await;
 
-  match result {
-    Err(e) => match e {
-      // The Error enum provides details about what exactly happened.
-      // You can also just use its `Debug`, `Display` or `Error` traits
-      Error::HttpError(_)
-      | Error::Io(_)
-      | Error::MissingAPIKey
-      | Error::MissingToken(_)
-      | Error::Cancelled
-      | Error::UploadSizeLimitExceeded(_, _)
-      | Error::Failure(_)
-      | Error::BadRequest(_)
-      | Error::FieldClash(_)
-      | Error::JsonDecodeError(_, _) => println!("{}", e),
-    },
-    Ok(res) => println!("Success: {:?}", res),
-  }
+  let playlists = result?.1.items.unwrap();
+  let playlists = playlists
+    .iter()
+    .filter_map(|playlist| {
+      json!(playlist.snippet).get("title")?.to_string().starts_with("\"music-").then_some(playlist)
+    })
+    .collect::<Vec<_>>();
 
-  Ok("finished".to_string())
+  Ok(json!(playlists))
 }
 
 mod tests {
@@ -69,7 +44,11 @@ mod tests {
 
   #[tokio::test]
   async fn get_youtube_playlists_works() -> anyhow::Result<()> {
-    get_youtube_playlists().await?;
+    let playlists = get_youtube_playlists().await?;
+
+    let f = std::fs::File::create("playlists.json")?;
+    serde_json::to_writer_pretty(f, &playlists)?;
+
     Ok(())
   }
 }

@@ -3,7 +3,7 @@
 
 #[tauri::command]
 async fn get_playlists() -> String {
-  yucil::youtube::get_youtube_playlists().await.unwrap()
+  yucil::youtube::get_youtube_playlists().await.unwrap().to_string()
 }
 
 fn main() {
