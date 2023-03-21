@@ -2,8 +2,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 #[tauri::command]
-async fn get_playlists() -> String {
-  yucil::youtube::get_youtube_playlists().await.unwrap().to_string()
+async fn get_playlists() -> Vec<String> {
+  yucil::youtube::get_youtube_playlists().await.unwrap()
 }
 
 fn main() {

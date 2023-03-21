@@ -3,7 +3,7 @@
 use google_youtube3::{chrono, hyper, hyper_rustls, oauth2, Error, FieldMask, YouTube};
 use serde_json::json;
 
-pub async fn get_youtube_playlists() -> anyhow::Result<serde_json::Value> {
+pub async fn get_youtube_playlists() -> anyhow::Result<Vec<String>> {
   let secret = oauth2::read_application_secret("client_secret.json").await?;
 
   let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -26,7 +26,7 @@ pub async fn get_youtube_playlists() -> anyhow::Result<serde_json::Value> {
     auth,
   );
 
-  let result = hub.playlists().list(&vec!["snippet".to_string()]).mine(true).doit().await;
+  let result = hub.playlists().list(&vec!["snippet".into()]).mine(true).doit().await;
 
   let mut playlists = result?.1.items.unwrap();
   playlists.sort_by(|a, b| {
@@ -48,7 +48,7 @@ pub async fn get_youtube_playlists() -> anyhow::Result<serde_json::Value> {
     })
     .collect::<Vec<_>>();
 
-  Ok(json!(playlists))
+  Ok(playlists)
 }
 
 mod tests {
