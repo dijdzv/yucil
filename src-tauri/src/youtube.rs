@@ -1,6 +1,9 @@
 #![allow(unused_imports)]
 
+use std::io::Write;
+
 use google_youtube3::{chrono, hyper, hyper_rustls, oauth2, Error, FieldMask, YouTube};
+use serde::Serialize;
 use serde_json::json;
 
 pub async fn get_youtube_playlists() -> anyhow::Result<Vec<String>> {

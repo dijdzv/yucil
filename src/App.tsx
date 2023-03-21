@@ -1,12 +1,12 @@
-import { useState } from 'react';
-// import reactLogo from "./assets/react.svg";
-import { invoke } from '@tauri-apps/api/tauri';
 import Dashboard from './Dashboard';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import './App.css';
 
 function App() {
   return (
-    <Dashboard />
+    <GoogleOAuthProvider clientId="334026574425-anlocm3ioj1fipj516m5euh6n1imsdeo.apps.googleusercontent.com">
+      <Dashboard />
+    </GoogleOAuthProvider>
   );
 }
 

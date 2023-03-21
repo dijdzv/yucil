@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { List, Badge, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link } from '@mui/material';
+import { List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
+import { GoogleLogin } from '@react-oauth/google';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -81,8 +81,17 @@ export default function Bar() {
   return (
     <>
       <AppBar position="absolute" open={open} sx={{ backgroundColor: '#000' }}>
-        <Toolbar>
-          <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
+        <Toolbar sx={{ justifyContent: 'space-between', ml: 5 }}>
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              console.log(credentialResponse);
+            }}
+            onError={() => {
+              console.log('Login Failed');
+            }}
+            theme={'filled_black'}
+          />
+          <Typography component="h1" variant="h6" color="inherit" noWrap>
             <Copyright sx={{}} />
           </Typography>
         </Toolbar>
