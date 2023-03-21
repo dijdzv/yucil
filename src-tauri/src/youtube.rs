@@ -28,11 +28,23 @@ pub async fn get_youtube_playlists() -> anyhow::Result<serde_json::Value> {
 
   let result = hub.playlists().list(&vec!["snippet".to_string()]).mine(true).doit().await;
 
-  let playlists = result?.1.items.unwrap();
+  let mut playlists = result?.1.items.unwrap();
+  playlists.sort_by(|a, b| {
+    json!(a.snippet)
+      .get("title")
+      .unwrap()
+      .to_string()
+      .partial_cmp(&json!(b.snippet).get("title").unwrap().to_string())
+      .unwrap()
+  });
   let playlists = playlists
     .iter()
     .filter_map(|playlist| {
-      json!(playlist.snippet).get("title")?.to_string().starts_with("\"music-").then_some(playlist)
+      json!(playlist.snippet)
+        .get("title")?
+        .to_string()
+        .starts_with("\"music-")
+        .then_some(playlist.id.clone()?)
     })
     .collect::<Vec<_>>();
 
