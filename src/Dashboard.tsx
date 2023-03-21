@@ -1,3 +1,4 @@
+import { invoke } from '@tauri-apps/api/tauri';
 import { useMemo, useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline, Container } from '@mui/material';
@@ -28,11 +29,17 @@ export default function DashboardContent() {
       }),
     [prefersDarkMode]
   );
-  const [url, setUrl] = useState('');
+  const [urls, setUrls] = useState([""]);
+
+  async function get_playlists() {
+    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+    const urls: string[] = await invoke('get_playlists');
+    setUrls(urls);
+  }
+
   useEffect(() => {
     (async () => {
-      const url = 'https://www.youtube.com/playlist?list=PLT9jUIZQ61i7Tf3t1ai7RqdXLSYFJiPUJ';
-      setUrl(url);
+      await get_playlists();
     })();
   });
 
@@ -110,7 +117,7 @@ export default function DashboardContent() {
             sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer url={url} />
+              <MusicPlayer url={urls[0]} />
               {/* <UrlPlayer /> */}
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
