@@ -144,6 +144,18 @@ export function MusicPlayer(props: any) {
     handlePlaying(true);
   };
 
+  /**
+   * player.playVideoAt(index:Number):Void
+   * この関数は、再生リストの指定された動画を読み込んで再生します。
+   * index パラメータ（必須）には、再生リスト中の再生する動画のインデックスを指定します。
+   * このパラメータはゼロベース インデックスを使用するため、値 0 はリスト内の最初の動画を指定します。
+   * 再生リストがシャッフルされた場合、この関数は、シャッフルした再生リストの指定された部分を再生します。
+   */
+  const handlePlaylistAt = (index: number) => {
+    ref.current?.getInternalPlayer().playVideoAt(index);
+    handlePlaying(true);
+  };
+
   const handlePlaying = (playing?: boolean) => {
     playing !== undefined ? setPlaying(playing) : setPlaying((prev) => !prev);
   };

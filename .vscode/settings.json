@@ -1,3 +1,8 @@
 {
-  "rust-analyzer.linkedProjects": ["${workspaceFolder}/src-tauri/Cargo.toml"]
+  "rust-analyzer.linkedProjects": [
+    "${workspaceFolder}/src-tauri/Cargo.toml"
+  ],
+  "cSpell.words": [
+    "yucil"
+  ]
 }

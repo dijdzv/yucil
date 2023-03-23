@@ -1,18 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri + React + TS</title>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoad()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisInit()"></script>
+    <title>yucil</title>
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <!-- <button id="revokeBtn" onclick="revokeToken();">Revoke access token</button> -->
+    <script>
+      let tokenClient;
 
-  <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-  <script src="auth.js"></script>
-  <script src="https://apis.google.com/js/client.js?onload=googleApiClientReady"></script> -->
+      function gapiInit() {
+        gapi.client.init({
+          // NOTE: OAuth2 'scope' and 'client_id' parameters have moved to initTokenClient().
+        })
+          .then(function () {
+            gapi.client.load("https://youtube.googleapis.com/$discovery/rest?version=v3");
+          });
+      }
+
+      function gapiLoad() {
+        gapi.load('client', gapiInit)
+      }
+
+      function gisInit() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: '334026574425-anlocm3ioj1fipj516m5euh6n1imsdeo.apps.googleusercontent.com',
+          scope: 'https://www.googleapis.com/auth/youtube',
+          callback: '',  // defined at request time
+        });
+      }
+    </script>
+  </body>
 </html>

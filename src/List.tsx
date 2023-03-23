@@ -53,7 +53,7 @@ export default function List(props: any) {
       <CardContent sx={{ p: 1, height: '100%' }}>
         <MuiList
           subheader={
-            <ListSubheader sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}>{playlist.name}</ListSubheader>
+            <ListSubheader sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}>{playlist.title}</ListSubheader>
           }
           sx={{ height: '100%' }}
         >

@@ -2,23 +2,23 @@ import { useMemo, useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline, Container } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import GridLayout from 'react-grid-layout';
+// import GridLayout from 'react-grid-layout';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import Trash from './Trash';
 import { UrlPlayer, MusicPlayer } from './Player';
-import { invoke } from '@tauri-apps/api';
+// import { invoke } from '@tauri-apps/api';
 
 export interface Playlist {
-  url: string;
-  name: string;
+  id: string;
+  title: string;
   items: PlaylistItems;
 }
 
-export type PlaylistItems = { url: string; title: string }[];
+export type PlaylistItems = { id: string; title: string }[];
 
-export default function DashboardContent() {
+export default function Dashboard() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const theme = useMemo(
     () =>
@@ -29,39 +29,16 @@ export default function DashboardContent() {
       }),
     [prefersDarkMode]
   );
-  const [urls, setUrls] = useState(['']);
-
-  async function get_playlists() {
-    const urls: string[] = await invoke('get_playlists');
-    setUrls(urls);
-  }
+  const [url, setUrl] = useState('');
 
   useEffect(() => {
     (async () => {
-      await get_playlists();
+      const id = ['PL4VC1DpGBW3Yo4zgLKot3BMdMVbnb4rME'];
+      setUrl('https://www.youtube.com/playlist?list=' + id);
     })();
-  });
+  }, []);
 
-  const initialPlaylists: { url: string; name: string; items: { url: string; title: string }[] }[] = [];
-  for (let i = 0; i < 2; i++) {
-    const playlistIndex = i + 1;
-    const playlist: { url: string; name: string; items: { url: string; title: string }[] } = {
-      url: `https://example.com/playlist${playlistIndex}`,
-      name: `Playlist ${playlistIndex}`,
-      items: [],
-    };
-
-    for (let j = 0; j < 10; j++) {
-      const itemIndex = j + 1;
-      playlist.items.push({
-        url: `https://example.com/playlist${playlistIndex}/item${itemIndex}`,
-        title: `Item ${itemIndex}`,
-      });
-    }
-
-    initialPlaylists.push(playlist);
-  }
-  const [playlists, setPlaylists] = useState(initialPlaylists);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
   const reorder = (prev: Playlist[], startIndex: number, startId: number, endIndex: number, endId: number) => {
     const result = prev;
@@ -100,7 +77,7 @@ export default function DashboardContent() {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <Bar />
+        <Bar setPlaylists={setPlaylists} />
         <Box
           component="main"
           sx={{
@@ -116,11 +93,11 @@ export default function DashboardContent() {
             sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer url={'https://www.youtube.com/playlist?list=' + urls[0]} />
+              <MusicPlayer url={url} />
               {/* <UrlPlayer /> */}
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
-                  <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.url} />
+                  <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.id} />
                 ))}
               </Box>
               {/* <Trash /> */}

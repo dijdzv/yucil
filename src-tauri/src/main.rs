@@ -3,6 +3,7 @@
 
 use tauri::{utils::config::AppUrl, WindowUrl};
 
+// unused
 #[tauri::command]
 async fn get_playlists() -> Vec<String> {
   yucil::youtube::get_youtube_playlists().await.unwrap()

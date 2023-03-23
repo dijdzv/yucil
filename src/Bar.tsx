@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
-import { GoogleLogin } from '@react-oauth/google';
+import { getPlaylists } from './api';
+import { Playlist } from './Dashboard';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -72,7 +73,8 @@ function Copyright(props: any) {
   );
 }
 
-export default function Bar() {
+export default function Bar(props: any) {
+  const setPlaylists: Dispatch<SetStateAction<Playlist[]>> = props.setPlaylists;
   const [open, setOpen] = useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -82,15 +84,7 @@ export default function Bar() {
     <>
       <AppBar position="absolute" open={open} sx={{ backgroundColor: '#000' }}>
         <Toolbar sx={{ justifyContent: 'space-between', ml: 5 }}>
-          <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              console.log(credentialResponse);
-            }}
-            onError={() => {
-              console.log('Login Failed');
-            }}
-            theme={'filled_black'}
-          />
+          <button onClick={() => getPlaylists(setPlaylists)}>getPlaylists</button>
           <Typography component="h1" variant="h6" color="inherit" noWrap>
             <Copyright sx={{}} />
           </Typography>
