@@ -8,6 +8,7 @@ import Bar from './Bar';
 import List from './List';
 import Trash from './Trash';
 import { UrlPlayer, MusicPlayer } from './Player';
+import { getPlaylists } from './api';
 // import { invoke } from '@tauri-apps/api';
 
 export interface Playlist {
@@ -30,15 +31,18 @@ export default function Dashboard() {
     [prefersDarkMode]
   );
   const [url, setUrl] = useState('');
+  const [select, setSelect] = useState(-1);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
   useEffect(() => {
-    (async () => {
-      const id = ['PL4VC1DpGBW3Yo4zgLKot3BMdMVbnb4rME'];
-      setUrl('https://www.youtube.com/playlist?list=' + id);
-    })();
+    getPlaylists(setPlaylists);
+    setSelect(0);
   }, []);
 
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  useEffect(() => {
+    console.log('select', select);
+    setUrl('https://www.youtube.com/playlist?list=' + playlists.at(select)?.id);
+  }, [select]);
 
   const reorder = (prev: Playlist[], startIndex: number, startId: number, endIndex: number, endId: number) => {
     const result = prev;
