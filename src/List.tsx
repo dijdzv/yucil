@@ -21,6 +21,8 @@ const getRenderItem =
         name={items[rubric.source.index].title}
         thumbnail={items[rubric.source.index].thumbnail}
         channel={items[rubric.source.index].channel}
+        position={items[rubric.source.index].position}
+        playlistIndex={items[rubric.source.index].playlistIndex}
         isDragging={snapshot.isDragging}
       />
     );
@@ -47,7 +49,7 @@ const Row = React.memo(({ data: playlist, index, style }: RowProps) => {
 export default function List(props: any) {
   const playlist: Playlist = props.playlist;
   const index: number = props.index;
-  const setSelect: Dispatch<SetStateAction<number>> = props.setSelect;
+  const setUrl: Dispatch<SetStateAction<string>> = props.setUrl;
 
   const renderItem = getRenderItem(playlist.items);
 
@@ -57,7 +59,7 @@ export default function List(props: any) {
         <MuiList
           subheader={
             <ListSubheader
-              onClick={() => setSelect(index)}
+              onClick={() => setUrl('https://www.youtube.com/playlist?list=' + playlist.id)}
               sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
             >
               {playlist.title}
@@ -72,7 +74,7 @@ export default function List(props: any) {
                   <FixedSizeList
                     height={height}
                     itemCount={playlist.items.length}
-                    itemSize={51.91}
+                    itemSize={48.48}
                     width={width}
                     outerRef={provided.innerRef}
                     itemData={playlist}

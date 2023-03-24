@@ -3,7 +3,10 @@ declare const google: any;
 import { Dispatch, SetStateAction } from 'react';
 import { Playlist, PlaylistItem } from './Dashboard';
 
-export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlist[]>>) {
+export function getPlaylists(
+  setPlaylists: Dispatch<SetStateAction<Playlist[]>>,
+  setUrl: Dispatch<SetStateAction<string | undefined>>
+) {
   tokenClient.callback = (resp: any) => {
     if (resp.error !== undefined) {
       throw resp;
@@ -22,7 +25,7 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlist[]>>)
           return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
         });
         const playlistsPromise: Promise<Playlist>[] =
-          playlists?.map(async (playlist) => {
+          playlists?.map(async (playlist, playlistIndex) => {
             return gapi.client.youtube.playlistItems
               .list({
                 part: 'snippet',
@@ -42,6 +45,7 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlist[]>>)
                         kind: playlistItem.snippet?.resourceId?.kind || '',
                         videoId: playlistItem.snippet?.resourceId?.videoId || '',
                       },
+                      playlistIndex: playlistIndex,
                     };
                   }) || [];
                 return {
@@ -61,6 +65,7 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlist[]>>)
           }) || [];
         Promise.all(playlistsPromise).then((newPlaylists) => {
           setPlaylists(newPlaylists);
+          setUrl('https://www.youtube.com/playlist?list=' + newPlaylists[0].id);
         });
       })
       .catch((err) => console.log(err));

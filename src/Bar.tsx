@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link } from '@mui/material';
+import { Box, List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
@@ -81,6 +81,7 @@ export default function Bar(props: any) {
     <>
       <AppBar position="absolute" open={open} sx={{ backgroundColor: '#000' }}>
         <Toolbar sx={{ justifyContent: 'space-between', ml: 5 }}>
+          <Box />
           <Typography component="h1" variant="h6" color="inherit" noWrap>
             <Copyright sx={{}} />
           </Typography>

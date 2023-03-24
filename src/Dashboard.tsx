@@ -27,6 +27,7 @@ export type PlaylistItem = {
     kind: string;
     videoId: string;
   };
+  playlistIndex: number;
 };
 
 export default function Dashboard() {
@@ -40,20 +41,12 @@ export default function Dashboard() {
       }),
     [prefersDarkMode]
   );
-  const [url, setUrl] = useState('');
-  const [select, setSelect] = useState(-1);
+  const [url, setUrl] = useState<string>();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
   useEffect(() => {
-    getPlaylists(setPlaylists);
-    setSelect(0);
+    getPlaylists(setPlaylists, setUrl);
   }, []);
-
-  useEffect(() => {
-    console.log('select', select);
-    console.log(playlists);
-    setUrl('https://www.youtube.com/playlist?list=' + playlists.at(select)?.id);
-  }, [select]);
 
   const reorder = (prev: Playlist[], startIndex: number, startId: number, endIndex: number, endId: number) => {
     const result = prev;
@@ -117,7 +110,7 @@ export default function Dashboard() {
                     setPlaylists={setPlaylists}
                     index={index}
                     key={playlist.id}
-                    setSelect={setSelect}
+                    setUrl={setUrl}
                   />
                 ))}
               </Box>

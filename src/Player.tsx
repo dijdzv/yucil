@@ -46,7 +46,7 @@ export function UrlPlayer() {
 export function MusicPlayer(props: any) {
   const { url } = props;
 
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const [loop, setLoop] = useState(true);
   const [oneLoop, setOneLoop] = useState(false);
   const [volume, setVolume] = useState(0.3);
@@ -79,7 +79,7 @@ export function MusicPlayer(props: any) {
     intervalRef.current = setInterval(() => {
       setTime({
         current: player?.getCurrentTime() || 0,
-        duration: player?.getDuration() || 0,
+        duration,
       });
     }, 500);
   };
@@ -92,6 +92,11 @@ export function MusicPlayer(props: any) {
   const handleTitle = () => {
     const iframe = document.querySelector('#music-player')?.querySelector('iframe');
     setTitle(iframe?.getAttribute('title'));
+  };
+
+  const handleOnReady = () => {
+    handleTitle();
+    startTimer();
   };
 
   const handleOnPlay = () => {
@@ -175,12 +180,14 @@ export function MusicPlayer(props: any) {
         ref={ref}
         url={url}
         playing={playing}
+        playsinline={true}
         loop={loop}
         volume={volume}
         muted={muted}
         controls={false}
         width={0}
         height={0}
+        onReady={handleOnReady}
         onPlay={handleOnPlay}
         onEnded={handleOnEnded}
         onPause={handleOnPause}
