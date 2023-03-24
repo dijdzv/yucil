@@ -3,6 +3,7 @@
     "${workspaceFolder}/src-tauri/Cargo.toml"
   ],
   "cSpell.words": [
-    "yucil"
+    "yucil",
+    "gapi"
   ]
 }

@@ -13,10 +13,10 @@ import { UrlPlayer, MusicPlayer } from './Player';
 export interface Playlist {
   id: string;
   title: string;
-  items: PlaylistItems;
+  items: PlaylistItem[];
 }
 
-export type PlaylistItems = { id: string; title: string }[];
+export type PlaylistItem = { id: string; title: string };
 
 export default function Dashboard() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');

@@ -10,10 +10,10 @@ import {
 import { FixedSizeList, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Item from './Item';
-import { Playlist, PlaylistItems } from './Dashboard';
+import { Playlist, PlaylistItem } from './Dashboard';
 
 const getRenderItem =
-  (items: PlaylistItems) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) =>
+  (items: PlaylistItem[]) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) =>
     (
       <Item
         innerRef={provided.innerRef}
@@ -30,12 +30,12 @@ interface RowProps {
 }
 
 const Row = React.memo(({ data: playlist, index, style }: RowProps) => {
-  const item = playlist.items[index];
+  const playlistItem = playlist.items[index];
   const renderItem = getRenderItem(playlist.items);
 
   return (
-    <Box sx={style} key={index + item.url}>
-      <Draggable draggableId={index + item.url} index={index} key={index + item.url}>
+    <Box sx={style} key={index + playlistItem.id}>
+      <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
         {renderItem}
       </Draggable>
     </Box>
