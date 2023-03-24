@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { Box, List as MuiList, Card, CardContent, ListSubheader } from '@mui/material';
 import {
   Droppable,
@@ -19,6 +19,8 @@ const getRenderItem =
         innerRef={provided.innerRef}
         provided={provided}
         name={items[rubric.source.index].title}
+        thumbnail={items[rubric.source.index].thumbnail}
+        channel={items[rubric.source.index].channel}
         isDragging={snapshot.isDragging}
       />
     );
@@ -45,6 +47,7 @@ const Row = React.memo(({ data: playlist, index, style }: RowProps) => {
 export default function List(props: any) {
   const playlist: Playlist = props.playlist;
   const index: number = props.index;
+  const setSelect: Dispatch<SetStateAction<number>> = props.setSelect;
 
   const renderItem = getRenderItem(playlist.items);
 
@@ -53,7 +56,12 @@ export default function List(props: any) {
       <CardContent sx={{ p: 1, height: '100%' }}>
         <MuiList
           subheader={
-            <ListSubheader sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}>{playlist.title}</ListSubheader>
+            <ListSubheader
+              onClick={() => setSelect(index)}
+              sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
+            >
+              {playlist.title}
+            </ListSubheader>
           }
           sx={{ height: '100%' }}
         >
@@ -64,7 +72,7 @@ export default function List(props: any) {
                   <FixedSizeList
                     height={height}
                     itemCount={playlist.items.length}
-                    itemSize={48}
+                    itemSize={51.91}
                     width={width}
                     outerRef={provided.innerRef}
                     itemData={playlist}

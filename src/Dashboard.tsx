@@ -17,7 +17,17 @@ export interface Playlist {
   items: PlaylistItem[];
 }
 
-export type PlaylistItem = { id: string; title: string };
+export type PlaylistItem = {
+  id: string;
+  title: string;
+  thumbnail: string;
+  channel: string;
+  position: number;
+  resourceId: {
+    kind: string;
+    videoId: string;
+  };
+};
 
 export default function Dashboard() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -41,6 +51,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     console.log('select', select);
+    console.log(playlists);
     setUrl('https://www.youtube.com/playlist?list=' + playlists.at(select)?.id);
   }, [select]);
 
@@ -101,7 +112,13 @@ export default function Dashboard() {
               {/* <UrlPlayer /> */}
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
-                  <List playlist={playlist} setPlaylists={setPlaylists} index={index} key={playlist.id} />
+                  <List
+                    playlist={playlist}
+                    setPlaylists={setPlaylists}
+                    index={index}
+                    key={playlist.id}
+                    setSelect={setSelect}
+                  />
                 ))}
               </Box>
               {/* <Trash /> */}

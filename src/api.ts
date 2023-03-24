@@ -35,6 +35,13 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlist[]>>)
                     return {
                       id: playlistItem.id || 'undefined',
                       title: playlistItem.snippet?.title || 'undefined',
+                      thumbnail: playlistItem.snippet?.thumbnails?.default?.url || '',
+                      channel: playlistItem.snippet?.videoOwnerChannelTitle || 'undefined',
+                      position: playlistItem.snippet?.position || 0,
+                      resourceId: {
+                        kind: playlistItem.snippet?.resourceId?.kind || '',
+                        videoId: playlistItem.snippet?.resourceId?.videoId || '',
+                      },
                     };
                   }) || [];
                 return {
