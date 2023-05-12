@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { Box, List as MuiList, Card, CardContent, ListSubheader } from '@mui/material';
 import {
   Droppable,
@@ -50,6 +50,10 @@ export default function List(props: any) {
   const playlist: Playlist = props.playlist;
   const index: number = props.index;
   const setUrl: Dispatch<SetStateAction<string>> = props.setUrl;
+  const intervalRef: any = props.intervalRef;
+
+  const defaultColor = 'rgba(255, 255, 255, 0.5)';
+  const [color, setColor] = useState<string>(defaultColor);
 
   const renderItem = getRenderItem(playlist.items);
 
@@ -59,8 +63,16 @@ export default function List(props: any) {
         <MuiList
           subheader={
             <ListSubheader
-              onClick={() => setUrl('https://www.youtube.com/playlist?list=' + playlist.id)}
-              sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
+              onClick={() => {
+                setColor('rgba(255, 255, 255, 1)');
+                clearInterval(intervalRef.current);
+                setUrl('');
+                setTimeout(() => {
+                  setColor(defaultColor);
+                  setUrl('https://www.youtube.com/playlist?list=' + playlist.id);
+                }, 350);
+              }}
+              sx={{ color, borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
             >
               {playlist.title}
             </ListSubheader>

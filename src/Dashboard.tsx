@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline, Container } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -43,6 +43,8 @@ export default function Dashboard() {
   );
   const [url, setUrl] = useState<string>();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+
+  const intervalRef = useRef<any>(null);
 
   useEffect(() => {
     getPlaylists(setPlaylists, setUrl);
@@ -101,7 +103,7 @@ export default function Dashboard() {
             sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer url={url} />
+              <MusicPlayer url={url} intervalRef={intervalRef} />
               {/* <UrlPlayer /> */}
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
@@ -111,6 +113,7 @@ export default function Dashboard() {
                     index={index}
                     key={playlist.id}
                     setUrl={setUrl}
+                    intervalRef={intervalRef}
                   />
                 ))}
               </Box>

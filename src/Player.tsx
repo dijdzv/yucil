@@ -20,6 +20,7 @@ import Replay10Icon from '@mui/icons-material/Replay10';
 import Replay30Icon from '@mui/icons-material/Replay30';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { OnProgressProps } from 'react-player/base';
+import { Playlist } from './Dashboard';
 
 export function UrlPlayer() {
   const [url, setUrl] = useState<string>();
@@ -44,7 +45,7 @@ export function UrlPlayer() {
 }
 
 export function MusicPlayer(props: any) {
-  const { url } = props;
+  const { url, intervalRef } = props;
 
   const [playing, setPlaying] = useState(false);
   const [loop, setLoop] = useState(true);
@@ -55,7 +56,6 @@ export function MusicPlayer(props: any) {
   const [title, setTitle] = useState<string | null | undefined>();
   const [shuffle, setShuffle] = useState(false);
 
-  const intervalRef = useRef<any>(null);
   const ref = useRef<ReactPlayer>(null);
 
   const opacity = (condition: boolean): object => ({
@@ -100,7 +100,7 @@ export function MusicPlayer(props: any) {
   };
 
   const handleOnPlay = () => {
-    startTimer();
+    intervalRef.current === null && startTimer();
     handleTitle();
   };
 
@@ -171,6 +171,16 @@ export function MusicPlayer(props: any) {
 
   const handleVolume = (volume: number) => {
     setVolume(volume);
+  };
+
+  const handlePlaylist = (playlist: Playlist) => {
+    ref.current?.getInternalPlayer().loadPlaylist({
+      list: playlist.id,
+      listType: 'playlist',
+      index: 0,
+      startSeconds: 0,
+      suggestedQuality: 'small',
+    });
   };
 
   return (
