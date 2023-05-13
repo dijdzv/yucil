@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { Box, List as MuiList, Card, CardContent, ListSubheader } from '@mui/material';
 import {
   Droppable,
@@ -10,7 +10,7 @@ import {
 import { FixedSizeList, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Item from './Item';
-import { Playlist, PlaylistItem } from './Dashboard';
+import { BASE_PLAYLIST_URL, Playlist, PlaylistItem } from './Dashboard';
 
 const getRenderItem =
   (items: PlaylistItem[]) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) =>
@@ -28,17 +28,27 @@ const getRenderItem =
     );
 
 interface RowProps {
-  data: Playlist;
+  data: {
+    playlist: Playlist;
+    ref: any;
+    intervalRef: any;
+  };
   index: number;
   style: Object;
 }
 
-const Row = React.memo(({ data: playlist, index, style }: RowProps) => {
+const Row = React.memo(({ data: { playlist, ref, intervalRef }, index, style }: RowProps) => {
   const playlistItem = playlist.items[index];
   const renderItem = getRenderItem(playlist.items);
 
   return (
-    <Box sx={style} key={index + playlistItem.id}>
+    <Box
+      sx={style}
+      key={index + playlistItem.id}
+      onClick={() => {
+        clearInterval(intervalRef.current);
+      }}
+    >
       <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
         {renderItem}
       </Draggable>
@@ -50,10 +60,7 @@ export default function List(props: any) {
   const playlist: Playlist = props.playlist;
   const index: number = props.index;
   const setUrl: Dispatch<SetStateAction<string>> = props.setUrl;
-  const intervalRef: any = props.intervalRef;
-
-  const defaultColor = 'rgba(255, 255, 255, 0.5)';
-  const [color, setColor] = useState<string>(defaultColor);
+  const { ref, intervalRef } = props;
 
   const renderItem = getRenderItem(playlist.items);
 
@@ -64,15 +71,13 @@ export default function List(props: any) {
           subheader={
             <ListSubheader
               onClick={() => {
-                setColor('rgba(255, 255, 255, 1)');
                 setUrl('');
                 clearInterval(intervalRef.current);
                 setTimeout(() => {
-                  setColor(defaultColor);
-                  setUrl('https://www.youtube.com/playlist?list=' + playlist.id);
+                  setUrl(BASE_PLAYLIST_URL + playlist.id);
                 }, 350);
               }}
-              sx={{ color, borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
+              sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
             >
               {playlist.title}
             </ListSubheader>
@@ -89,7 +94,7 @@ export default function List(props: any) {
                     itemSize={48.48}
                     width={width}
                     outerRef={provided.innerRef}
-                    itemData={playlist}
+                    itemData={{ playlist, ref, intervalRef }}
                   >
                     {Row}
                   </FixedSizeList>

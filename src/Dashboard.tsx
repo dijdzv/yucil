@@ -9,7 +9,10 @@ import List from './List';
 import Trash from './Trash';
 import { UrlPlayer, MusicPlayer } from './Player';
 import { getPlaylists } from './api';
+import ReactPlayer from 'react-player';
 // import { invoke } from '@tauri-apps/api';
+
+export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
 
 export interface Playlist {
   id: string;
@@ -44,7 +47,8 @@ export default function Dashboard() {
   const [url, setUrl] = useState<string>();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
-  const intervalRef = useRef<any>(null);
+  const intervalRef = useRef<NodeJS.Timer>(null);
+  // const ref = useRef<ReactPlayer>(null);
 
   useEffect(() => {
     getPlaylists(setPlaylists, setUrl);
@@ -103,7 +107,7 @@ export default function Dashboard() {
             sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer url={url} intervalRef={intervalRef} />
+              <MusicPlayer url={url} intervalRef={intervalRef} /*ref={ref}*/ />
               {/* <UrlPlayer /> */}
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (

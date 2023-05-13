@@ -1,7 +1,7 @@
 declare let tokenClient: any;
 declare const google: any;
 import { Dispatch, SetStateAction } from 'react';
-import { Playlist, PlaylistItem } from './Dashboard';
+import { BASE_PLAYLIST_URL, Playlist, PlaylistItem } from './Dashboard';
 
 export function getPlaylists(
   setPlaylists: Dispatch<SetStateAction<Playlist[]>>,
@@ -25,7 +25,7 @@ export function getPlaylists(
           return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
         });
         const playlistsPromise: Promise<Playlist>[] =
-          playlists?.map(async (playlist, _playlistIndex) => {
+          playlists?.map(async (playlist, playlistIndex) => {
             return gapi.client.youtube.playlistItems
               .list({
                 part: 'snippet',
@@ -65,7 +65,7 @@ export function getPlaylists(
           }) || [];
         Promise.all(playlistsPromise).then((newPlaylists) => {
           setPlaylists(newPlaylists);
-          setUrl('https://www.youtube.com/playlist?list=' + newPlaylists[0].id);
+          setUrl(BASE_PLAYLIST_URL + newPlaylists[0].id);
         });
       })
       .catch((err) => console.log(err));

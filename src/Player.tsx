@@ -165,7 +165,7 @@ export function MusicPlayer(props: any) {
     playing !== undefined ? setPlaying(playing) : setPlaying((prev) => !prev);
   };
 
-  const handelMuted = () => {
+  const handleMuted = () => {
     setMuted((prev) => !prev);
   };
 
@@ -256,7 +256,7 @@ export function MusicPlayer(props: any) {
             <IconButton onClick={() => handleNext()} sx={{ flexGrow: 1, p: 0 }}>
               <SkipNextIcon />
             </IconButton>
-            <IconButton onClick={handelMuted} sx={{ flexGrow: 1, p: 0 }}>
+            <IconButton onClick={handleMuted} sx={{ flexGrow: 1, p: 0 }}>
               {(muted || volume === 0) && <VolumeOffIcon />}
               {!muted && volume > 0 && volume < 0.5 && <VolumeDownIcon />}
               {!muted && volume >= 0.5 && <VolumeUpIcon />}

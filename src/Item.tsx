@@ -4,14 +4,7 @@ export default function Item(props: any) {
   const { provided, innerRef, name, thumbnail, channel, position, playlistId, isDragging } = props;
 
   return (
-    <div
-      ref={innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      onClick={() => {
-        console.log('click', playlistId, position);
-      }}
-    >
+    <div ref={innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
       <ListItem
         disablePadding
         sx={{ bgcolor: isDragging ? '#4d4d4d' : '#121212', outline: 'solid 1px rgba(255, 255, 255, 0.12)' }}
