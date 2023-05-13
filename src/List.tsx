@@ -65,8 +65,8 @@ export default function List(props: any) {
             <ListSubheader
               onClick={() => {
                 setColor('rgba(255, 255, 255, 1)');
-                clearInterval(intervalRef.current);
                 setUrl('');
+                clearInterval(intervalRef.current);
                 setTimeout(() => {
                   setColor(defaultColor);
                   setUrl('https://www.youtube.com/playlist?list=' + playlist.id);

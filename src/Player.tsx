@@ -207,6 +207,7 @@ export function MusicPlayer(props: any) {
         title={title}
         titleTypographyProps={{
           noWrap: true,
+          width: '30vw',
         }}
         subheader={timeToMinute(time.current) + ' / ' + timeToMinute(time.duration)}
       />
