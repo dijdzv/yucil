@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Box, Card, CardHeader, CardContent, Divider, IconButton, TextField, Toolbar, Slider } from '@mui/material';
 import ReactPlayer from 'react-player/youtube';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
@@ -22,30 +22,15 @@ import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { OnProgressProps } from 'react-player/base';
 import { Playlist } from './Dashboard';
 
-export function UrlPlayer() {
-  const [url, setUrl] = useState<string>();
+type MusicPlayerProps = {
+  url: string | undefined;
+  intervalRef: React.MutableRefObject<NodeJS.Timer | null>;
+  children?: React.ReactNode;
+};
 
-  return (
-    <Box sx={{ width: '50%', border: '1px solid #555', borderRadius: 1 }}>
-      <ReactPlayer url={url} playing={true} volume={0.3} controls={true} width={'100%'} height={250} />
-      <Toolbar disableGutters={true}>
-        <IconButton
-          onClick={() => {
-            navigator.clipboard.readText().then((clipText) => {
-              ReactPlayer.canPlay(clipText) && setUrl(clipText);
-            });
-          }}
-        >
-          <ContentPasteIcon />
-        </IconButton>
-        <TextField disabled label="URL..." variant="standard" value={url} fullWidth={true} />
-      </Toolbar>
-    </Box>
-  );
-}
-
-export function MusicPlayer(props: any) {
+export function MusicPlayer(props: MusicPlayerProps) {
   const { url, intervalRef } = props;
+  const ref = useRef<ReactPlayer>(null);
 
   const [playing, setPlaying] = useState(false);
   const [loop, setLoop] = useState(true);
@@ -55,8 +40,6 @@ export function MusicPlayer(props: any) {
   const [time, setTime] = useState({ current: 0, duration: 0 });
   const [title, setTitle] = useState<string | null | undefined>();
   const [shuffle, setShuffle] = useState(false);
-
-  const ref = useRef<ReactPlayer>(null);
 
   const opacity = (condition: boolean): object => ({
     opacity: condition ? 1 : 0.3,
@@ -85,7 +68,7 @@ export function MusicPlayer(props: any) {
   };
 
   const stopTimer = () => {
-    clearInterval(intervalRef.current);
+    clearInterval(intervalRef.current ?? undefined);
     intervalRef.current = null;
   };
 

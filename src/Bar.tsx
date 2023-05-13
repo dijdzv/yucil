@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
+import { Playlist } from './Dashboard';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -71,7 +72,15 @@ function Copyright(props: any) {
   );
 }
 
-export default function Bar(props: any) {
+type BarProps = {
+  playlists: Playlist[];
+  setUrl: Dispatch<SetStateAction<string | undefined>>;
+};
+
+export default function Bar(props: BarProps) {
+  // TODO: change playlist
+  const { playlists, setUrl } = props;
+
   const [open, setOpen] = useState(false);
   const toggleDrawer = () => {
     setOpen(!open);

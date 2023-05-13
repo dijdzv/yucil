@@ -27,17 +27,16 @@ const getRenderItem =
       />
     );
 
-interface RowProps {
+type RowProps = {
   data: {
     playlist: Playlist;
-    ref: any;
-    intervalRef: any;
+    intervalRef: React.MutableRefObject<NodeJS.Timer | null>;
   };
   index: number;
   style: Object;
-}
+};
 
-const Row = React.memo(({ data: { playlist, ref, intervalRef }, index, style }: RowProps) => {
+const Row = React.memo(({ data: { playlist, intervalRef }, index, style }: RowProps) => {
   const playlistItem = playlist.items[index];
   const renderItem = getRenderItem(playlist.items);
 
@@ -46,7 +45,8 @@ const Row = React.memo(({ data: { playlist, ref, intervalRef }, index, style }: 
       sx={style}
       key={index + playlistItem.id}
       onClick={() => {
-        clearInterval(intervalRef.current);
+        // TODO: change playlist item
+        clearInterval(intervalRef.current ?? undefined);
       }}
     >
       <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
@@ -56,12 +56,15 @@ const Row = React.memo(({ data: { playlist, ref, intervalRef }, index, style }: 
   );
 }, areEqual);
 
-export default function List(props: any) {
-  const playlist: Playlist = props.playlist;
-  const index: number = props.index;
-  const setUrl: Dispatch<SetStateAction<string>> = props.setUrl;
-  const { ref, intervalRef } = props;
+type ListProps = {
+  playlist: Playlist;
+  index: number;
+  setUrl: Dispatch<SetStateAction<string | undefined>>;
+  intervalRef: React.MutableRefObject<NodeJS.Timer | null>;
+};
 
+export default function List(props: ListProps) {
+  const { playlist, index, setUrl, intervalRef } = props;
   const renderItem = getRenderItem(playlist.items);
 
   return (
@@ -72,7 +75,7 @@ export default function List(props: any) {
             <ListSubheader
               onClick={() => {
                 setUrl('');
-                clearInterval(intervalRef.current);
+                clearInterval(intervalRef.current ?? undefined);
                 setTimeout(() => {
                   setUrl(BASE_PLAYLIST_URL + playlist.id);
                 }, 350);
@@ -94,7 +97,7 @@ export default function List(props: any) {
                     itemSize={48.48}
                     width={width}
                     outerRef={provided.innerRef}
-                    itemData={{ playlist, ref, intervalRef }}
+                    itemData={{ playlist, intervalRef }}
                   >
                     {Row}
                   </FixedSizeList>

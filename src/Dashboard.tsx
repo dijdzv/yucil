@@ -7,18 +7,18 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import Trash from './Trash';
-import { UrlPlayer, MusicPlayer } from './Player';
+import { MusicPlayer } from './Player';
 import { getPlaylists } from './api';
-import ReactPlayer from 'react-player';
+import ReactPlayer from 'react-player/youtube';
 // import { invoke } from '@tauri-apps/api';
 
 export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
 
-export interface Playlist {
+export type Playlist = {
   id: string;
   title: string;
   items: PlaylistItem[];
-}
+};
 
 export type PlaylistItem = {
   id: string;
@@ -47,8 +47,7 @@ export default function Dashboard() {
   const [url, setUrl] = useState<string>();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
-  const intervalRef = useRef<NodeJS.Timer>(null);
-  // const ref = useRef<ReactPlayer>(null);
+  const intervalRef = useRef<NodeJS.Timer | null>(null);
 
   useEffect(() => {
     getPlaylists(setPlaylists, setUrl);
@@ -91,7 +90,7 @@ export default function Dashboard() {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <Bar setPlaylists={setPlaylists} />
+        <Bar playlists={playlists} setUrl={setUrl} />
         <Box
           component="main"
           sx={{
@@ -99,7 +98,7 @@ export default function Dashboard() {
             //   theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
             flexGrow: 1,
             height: '100vh',
-            // overflow: 'hidden',
+            overflow: 'hidden',
           }}
         >
           <Container
@@ -107,18 +106,10 @@ export default function Dashboard() {
             sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer url={url} intervalRef={intervalRef} /*ref={ref}*/ />
-              {/* <UrlPlayer /> */}
+              <MusicPlayer url={url} intervalRef={intervalRef} />
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
-                  <List
-                    playlist={playlist}
-                    setPlaylists={setPlaylists}
-                    index={index}
-                    key={playlist.id}
-                    setUrl={setUrl}
-                    intervalRef={intervalRef}
-                  />
+                  <List playlist={playlist} index={index} key={playlist.id} setUrl={setUrl} intervalRef={intervalRef} />
                 ))}
               </Box>
               {/* <Trash /> */}
