@@ -22,7 +22,7 @@ const getRenderItem =
         thumbnail={items[rubric.source.index].thumbnail}
         channel={items[rubric.source.index].channel}
         position={items[rubric.source.index].position}
-        playlistIndex={items[rubric.source.index].playlistIndex}
+        playlistId={items[rubric.source.index].playlistId}
         isDragging={snapshot.isDragging}
       />
     );

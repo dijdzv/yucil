@@ -1,7 +1,7 @@
 import { ListItem, ListItemButton, CardMedia, ListItemText } from '@mui/material';
 
 export default function Item(props: any) {
-  const { provided, innerRef, name, thumbnail, channel, position, playlistIndex, isDragging } = props;
+  const { provided, innerRef, name, thumbnail, channel, position, playlistId, isDragging } = props;
 
   return (
     <div
@@ -9,7 +9,7 @@ export default function Item(props: any) {
       {...provided.draggableProps}
       {...provided.dragHandleProps}
       onClick={() => {
-        console.log('click', playlistIndex, position);
+        console.log('click', playlistId, position);
       }}
     >
       <ListItem

@@ -27,7 +27,7 @@ export type PlaylistItem = {
     kind: string;
     videoId: string;
   };
-  playlistIndex: number;
+  playlistId: string;
 };
 
 export default function Dashboard() {

@@ -25,7 +25,7 @@ export function getPlaylists(
           return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
         });
         const playlistsPromise: Promise<Playlist>[] =
-          playlists?.map(async (playlist, playlistIndex) => {
+          playlists?.map(async (playlist, _playlistIndex) => {
             return gapi.client.youtube.playlistItems
               .list({
                 part: 'snippet',
@@ -45,7 +45,7 @@ export function getPlaylists(
                         kind: playlistItem.snippet?.resourceId?.kind || '',
                         videoId: playlistItem.snippet?.resourceId?.videoId || '',
                       },
-                      playlistIndex: playlistIndex,
+                      playlistId: playlist.id || 'undefined',
                     };
                   }) || [];
                 return {
