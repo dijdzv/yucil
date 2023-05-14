@@ -67,7 +67,7 @@ export default function List(props: ListProps) {
   const renderItem = getRenderItem(playlist.items);
 
   return (
-    <Card variant="outlined" sx={{ height: '100%', width: 200 }}>
+    <Card variant="outlined" sx={{ minHeight: '17rem', maxHeight: '100%', width: '25%' }}>
       <CardContent sx={{ p: 1, height: '100%' }}>
         <MuiList
           subheader={

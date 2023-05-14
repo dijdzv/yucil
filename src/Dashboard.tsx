@@ -113,23 +113,30 @@ export default function Dashboard() {
             overflow: 'hidden',
           }}
         >
+          {/* // TODO: Grid layout  */}
           <Container
             maxWidth="lg"
-            sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
+            sx={{
+              p: 1,
+              mt: '4rem',
+              height: 'calc(100% - 4rem)',
+              position: 'relative',
+              display: 'flex',
+              flexWrap: 'wrap',
+              rowGap: '0',
+            }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
               <MusicPlayer playlist={playlist} ref={ref} />
-              <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
-                {playlists.map((playlist: Playlist, index: number) => (
-                  <List
-                    playlist={playlist}
-                    index={index}
-                    key={playlist.id}
-                    handlePlaylist={handlePlaylist}
-                    handlePlaylistAt={handlePlaylistAt}
-                  />
-                ))}
-              </Box>
+              {playlists.map((playlist: Playlist, index: number) => (
+                <List
+                  playlist={playlist}
+                  index={index}
+                  key={playlist.id}
+                  handlePlaylist={handlePlaylist}
+                  handlePlaylistAt={handlePlaylistAt}
+                />
+              ))}
               {/* <Trash /> */}
             </DragDropContext>
           </Container>
