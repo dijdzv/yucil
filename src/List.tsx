@@ -30,7 +30,7 @@ const getRenderItem =
 type RowProps = {
   data: {
     playlist: Playlist;
-    handlePlaylistAt: (oldPlaylist: Playlist, newPlaylist: Playlist, index: number) => void;
+    handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
   };
   index: number;
   style: Object;
@@ -45,7 +45,7 @@ const Row = React.memo(({ data: { playlist, handlePlaylistAt }, index, style }: 
       sx={style}
       key={index + playlistItem.id}
       onClick={() => {
-        // TODO: change playlist item
+        handlePlaylistAt(playlist, index);
       }}
     >
       <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
@@ -58,8 +58,8 @@ const Row = React.memo(({ data: { playlist, handlePlaylistAt }, index, style }: 
 type ListProps = {
   playlist: Playlist;
   index: number;
-  handlePlaylist: (newPlaylist?: Playlist) => void;
-  handlePlaylistAt: (oldPlaylist: Playlist, newPlaylist: Playlist, index: number) => void;
+  handlePlaylist: (newPlaylist?: Playlist, fn?: () => void) => void;
+  handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
 };
 
 export default function List(props: ListProps) {
@@ -72,12 +72,7 @@ export default function List(props: ListProps) {
         <MuiList
           subheader={
             <ListSubheader
-              onClick={() => {
-                handlePlaylist();
-                setTimeout(() => {
-                  handlePlaylist(playlist);
-                }, 200);
-              }}
+              onClick={() => handlePlaylist(playlist)}
               sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
             >
               {playlist.title}

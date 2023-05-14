@@ -1,7 +1,10 @@
-# Tauri + React + Typescript
+# yucil
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+> ** Youtube extended playlist for comfortable listening to music**
 
-## Recommended IDE Setup
+ ***incomplete / 未完成***
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+開発用実行コマンド
+```sh
+npm run tauri dev
+```

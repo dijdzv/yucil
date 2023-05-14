@@ -17,6 +17,7 @@ export type Playlist = {
   id: string;
   title: string;
   items: PlaylistItem[];
+  index: number;
 };
 
 export type PlaylistItem = {
@@ -52,16 +53,32 @@ export default function Dashboard() {
     getPlaylists(setPlaylist, setPlaylists);
   }, []);
 
-  const handlePlaylistAt = (oldPlaylist: Playlist, newPlaylist: Playlist, index: number) => {
-    if (oldPlaylist.id !== newPlaylist.id) {
-      setPlaylist(newPlaylist);
+  console.log(playlist);
+  /* //TODO:
+   * 異なるプレイリストに変更したとき
+   *  setPlaylist -> 〇, ref.current.handlePlaylistAt -> ×
+   * 同じプレイリストに変更したとき
+   *  setPlaylist -> ×, ref.current.handlePlaylistAt -> 〇
+   */
+  const handlePlaylistAt = (newPlaylist: Playlist, index: number) => {
+    newPlaylist.index = index;
+    console.log(playlist?.id, newPlaylist.id);
+    if (playlist?.id === newPlaylist.id) {
+      console.log(playlist?.index, newPlaylist.index);
+      playlist.index !== newPlaylist.index && setPlaylist(newPlaylist);
+      ref.current.handlePlaylistAt(index);
+    } else {
+      handlePlaylist(newPlaylist, () => ref.current.handlePlaylistAt(index));
     }
-    ref.current.handlePlaylistAt(index);
   };
 
-  const handlePlaylist = (newPlaylist?: Playlist) => {
-    setPlaylist(newPlaylist);
-    ref.current.handlePlaying(true);
+  const handlePlaylist = (newPlaylist?: Playlist, fn?: () => void) => {
+    setPlaylist(undefined);
+    setTimeout(() => {
+      setPlaylist(newPlaylist);
+      ref.current.handlePlaying(true);
+      fn && fn();
+    }, 200);
   };
 
   const reorder = (prev: Playlist[], startIndex: number, startId: number, endIndex: number, endId: number) => {

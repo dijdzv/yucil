@@ -1,7 +1,7 @@
 declare let tokenClient: any;
 declare const google: any;
 import { Dispatch, SetStateAction } from 'react';
-import { BASE_PLAYLIST_URL, Playlist, PlaylistItem } from './Dashboard';
+import { Playlist, PlaylistItem } from './Dashboard';
 
 export function getPlaylists(
   setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>,
@@ -52,6 +52,7 @@ export function getPlaylists(
                   id: playlist.id || 'undefined',
                   title: playlist.snippet?.title || 'undefined',
                   items: newPlaylistItems,
+                  index: 0,
                 };
               })
               .catch((err) => {
@@ -60,6 +61,7 @@ export function getPlaylists(
                   id: 'undefined',
                   title: 'undefined',
                   items: [],
+                  index: 0,
                 };
               });
           }) || [];

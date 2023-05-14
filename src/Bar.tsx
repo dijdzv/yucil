@@ -74,7 +74,7 @@ function Copyright(props: any) {
 
 type BarProps = {
   playlists: Playlist[];
-  handlePlaylist: (playlist: Playlist, index?: number) => void;
+  handlePlaylist: (playlist: Playlist, fn?: () => void) => void;
 };
 
 export default function Bar(props: BarProps) {
