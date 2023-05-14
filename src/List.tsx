@@ -30,7 +30,7 @@ const getRenderItem =
 type RowProps = {
   data: {
     playlist: Playlist;
-    handlePlaylistAt: (index: number, oldPlaylist: Playlist, newPlaylist: Playlist) => void;
+    handlePlaylistAt: (oldPlaylist: Playlist, newPlaylist: Playlist, index: number) => void;
   };
   index: number;
   style: Object;
@@ -58,8 +58,8 @@ const Row = React.memo(({ data: { playlist, handlePlaylistAt }, index, style }: 
 type ListProps = {
   playlist: Playlist;
   index: number;
-  handlePlaylist: (playlist: Playlist, index?: number) => void;
-  handlePlaylistAt: (index: number, oldPlaylist: Playlist, newPlaylist: Playlist) => void;
+  handlePlaylist: (newPlaylist?: Playlist) => void;
+  handlePlaylistAt: (oldPlaylist: Playlist, newPlaylist: Playlist, index: number) => void;
 };
 
 export default function List(props: ListProps) {
@@ -73,7 +73,7 @@ export default function List(props: ListProps) {
           subheader={
             <ListSubheader
               onClick={() => {
-                handlePlaylist(playlist);
+                handlePlaylist();
                 setTimeout(() => {
                   handlePlaylist(playlist);
                 }, 200);

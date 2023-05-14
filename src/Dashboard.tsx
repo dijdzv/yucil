@@ -9,7 +9,6 @@ import List from './List';
 import Trash from './Trash';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
 import { getPlaylists } from './api';
-import ReactPlayer from 'react-player/youtube';
 // import { invoke } from '@tauri-apps/api';
 
 export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
@@ -53,16 +52,16 @@ export default function Dashboard() {
     getPlaylists(setPlaylist, setPlaylists);
   }, []);
 
-  const handlePlaylistAt = (index: number, oldPlaylist: Playlist, newPlaylist: Playlist) => {
-    if (oldPlaylist.id === newPlaylist.id) {
-      ref.current.handlePlaylistAt(index);
-      return;
+  const handlePlaylistAt = (oldPlaylist: Playlist, newPlaylist: Playlist, index: number) => {
+    if (oldPlaylist.id !== newPlaylist.id) {
+      setPlaylist(newPlaylist);
     }
-    ref.current.handlePlaylist(newPlaylist, index);
+    ref.current.handlePlaylistAt(index);
   };
 
-  const handlePlaylist = (playlist: Playlist, index?: number) => {
-    ref.current.handlePlaylist(playlist, index);
+  const handlePlaylist = (newPlaylist?: Playlist) => {
+    setPlaylist(newPlaylist);
+    ref.current.handlePlaying(true);
   };
 
   const reorder = (prev: Playlist[], startIndex: number, startId: number, endIndex: number, endId: number) => {

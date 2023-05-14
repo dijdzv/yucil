@@ -28,7 +28,7 @@ type MusicPlayerProps = {
 
 export interface MusicPlayerRefHandle {
   handlePlaylistAt(index: number): void;
-  handlePlaylist(playlist: Playlist, index?: number): void;
+  handlePlaying(playing?: boolean): void;
 }
 
 export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(function MusicPlayer(props, ref) {
@@ -65,16 +65,8 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
           playerRef.current?.getInternalPlayer().playVideoAt(index);
           handlePlaying(true);
         },
-        handlePlaylist(playlist: Playlist, index?: number) {
-          handlePlaying(false);
-          playerRef.current?.getInternalPlayer().loadPlaylist({
-            list: playlist.id,
-            listType: 'playlist',
-            index: index ?? 0,
-            startSeconds: 0,
-            suggestedQuality: 'small',
-          });
-          handlePlaying(true);
+        handlePlaying(playing?: boolean) {
+          handlePlaying(playing);
         },
       };
     },
@@ -108,6 +100,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   };
 
   const handleOnReady = () => {
+    stopTimer();
     handleTitle();
     startTimer();
   };
