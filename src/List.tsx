@@ -30,12 +30,13 @@ const getRenderItem =
 type RowProps = {
   data: {
     playlist: Playlist;
+    handlePlaylistAt: (index: number, oldPlaylist: Playlist, newPlaylist: Playlist) => void;
   };
   index: number;
   style: Object;
 };
 
-const Row = React.memo(({ data: { playlist }, index, style }: RowProps) => {
+const Row = React.memo(({ data: { playlist, handlePlaylistAt }, index, style }: RowProps) => {
   const playlistItem = playlist.items[index];
   const renderItem = getRenderItem(playlist.items);
 
@@ -58,10 +59,11 @@ type ListProps = {
   playlist: Playlist;
   index: number;
   handlePlaylist: (playlist: Playlist, index?: number) => void;
+  handlePlaylistAt: (index: number, oldPlaylist: Playlist, newPlaylist: Playlist) => void;
 };
 
 export default function List(props: ListProps) {
-  const { playlist, index, handlePlaylist } = props;
+  const { playlist, index, handlePlaylist, handlePlaylistAt } = props;
   const renderItem = getRenderItem(playlist.items);
 
   return (
@@ -93,7 +95,7 @@ export default function List(props: ListProps) {
                     itemSize={48.48}
                     width={width}
                     outerRef={provided.innerRef}
-                    itemData={{ playlist }}
+                    itemData={{ playlist, handlePlaylistAt }}
                   >
                     {Row}
                   </FixedSizeList>

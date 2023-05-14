@@ -74,12 +74,12 @@ function Copyright(props: any) {
 
 type BarProps = {
   playlists: Playlist[];
-  setUrl: Dispatch<SetStateAction<string | undefined>>;
+  handlePlaylist: (playlist: Playlist, index?: number) => void;
 };
 
 export default function Bar(props: BarProps) {
   // TODO: change playlist
-  const { playlists, setUrl } = props;
+  const { playlists, handlePlaylist } = props;
 
   const [open, setOpen] = useState(false);
   const toggleDrawer = () => {

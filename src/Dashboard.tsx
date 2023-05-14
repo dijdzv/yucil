@@ -53,8 +53,12 @@ export default function Dashboard() {
     getPlaylists(setPlaylists, setUrl);
   }, []);
 
-  const handlePlaylistAt = (index: number) => {
-    ref.current.handlePlaylistAt(index);
+  const handlePlaylistAt = (index: number, oldPlaylist: Playlist, newPlaylist: Playlist) => {
+    if (oldPlaylist.id === newPlaylist.id) {
+      ref.current.handlePlaylistAt(index);
+      return;
+    }
+    ref.current.handlePlaylist(newPlaylist, index);
   };
 
   const handlePlaylist = (playlist: Playlist, index?: number) => {
@@ -98,7 +102,7 @@ export default function Dashboard() {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <Bar playlists={playlists} setUrl={setUrl} />
+        <Bar playlists={playlists} handlePlaylist={handlePlaylist} />
         <Box
           component="main"
           sx={{
@@ -117,7 +121,13 @@ export default function Dashboard() {
               <MusicPlayer url={url} ref={ref} />
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
-                  <List playlist={playlist} index={index} key={playlist.id} handlePlaylist={handlePlaylist} />
+                  <List
+                    playlist={playlist}
+                    index={index}
+                    key={playlist.id}
+                    handlePlaylist={handlePlaylist}
+                    handlePlaylistAt={handlePlaylistAt}
+                  />
                 ))}
               </Box>
               {/* <Trash /> */}
