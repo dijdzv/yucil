@@ -47,7 +47,6 @@ export default function Dashboard() {
   const [url, setUrl] = useState<string>();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
-  const intervalRef = useRef<NodeJS.Timer | null>(null);
   const ref = useRef({} as MusicPlayerRefHandle);
 
   useEffect(() => {
@@ -115,16 +114,10 @@ export default function Dashboard() {
             sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer url={url} intervalRef={intervalRef} ref={ref} />
+              <MusicPlayer url={url} ref={ref} />
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
-                  <List
-                    playlist={playlist}
-                    index={index}
-                    key={playlist.id}
-                    intervalRef={intervalRef}
-                    handlePlaylist={handlePlaylist}
-                  />
+                  <List playlist={playlist} index={index} key={playlist.id} handlePlaylist={handlePlaylist} />
                 ))}
               </Box>
               {/* <Trash /> */}

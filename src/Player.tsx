@@ -24,7 +24,6 @@ import { Playlist } from './Dashboard';
 
 type MusicPlayerProps = {
   url: string | undefined;
-  intervalRef: React.MutableRefObject<NodeJS.Timer | null>;
 };
 
 export interface MusicPlayerRefHandle {
@@ -33,9 +32,10 @@ export interface MusicPlayerRefHandle {
 }
 
 export const MusicPlayer = forwardRef<any, MusicPlayerProps>(function MusicPlayer(props, ref) {
-  const { url, intervalRef } = props;
+  const { url } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
+  const intervalRef = useRef<NodeJS.Timer | null>(null);
 
   const [playing, setPlaying] = useState(false);
   const [loop, setLoop] = useState(true);

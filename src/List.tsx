@@ -30,13 +30,12 @@ const getRenderItem =
 type RowProps = {
   data: {
     playlist: Playlist;
-    intervalRef: React.MutableRefObject<NodeJS.Timer | null>;
   };
   index: number;
   style: Object;
 };
 
-const Row = React.memo(({ data: { playlist, intervalRef }, index, style }: RowProps) => {
+const Row = React.memo(({ data: { playlist }, index, style }: RowProps) => {
   const playlistItem = playlist.items[index];
   const renderItem = getRenderItem(playlist.items);
 
@@ -46,7 +45,6 @@ const Row = React.memo(({ data: { playlist, intervalRef }, index, style }: RowPr
       key={index + playlistItem.id}
       onClick={() => {
         // TODO: change playlist item
-        clearInterval(intervalRef.current ?? undefined);
       }}
     >
       <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
@@ -59,12 +57,11 @@ const Row = React.memo(({ data: { playlist, intervalRef }, index, style }: RowPr
 type ListProps = {
   playlist: Playlist;
   index: number;
-  intervalRef: React.MutableRefObject<NodeJS.Timer | null>;
   handlePlaylist: (playlist: Playlist, index?: number) => void;
 };
 
 export default function List(props: ListProps) {
-  const { playlist, index, intervalRef, handlePlaylist } = props;
+  const { playlist, index, handlePlaylist } = props;
   const renderItem = getRenderItem(playlist.items);
 
   return (
@@ -74,7 +71,6 @@ export default function List(props: ListProps) {
           subheader={
             <ListSubheader
               onClick={() => {
-                clearInterval(intervalRef.current ?? undefined);
                 handlePlaylist(playlist);
                 setTimeout(() => {
                   handlePlaylist(playlist);
@@ -97,7 +93,7 @@ export default function List(props: ListProps) {
                     itemSize={48.48}
                     width={width}
                     outerRef={provided.innerRef}
-                    itemData={{ playlist, intervalRef }}
+                    itemData={{ playlist }}
                   >
                     {Row}
                   </FixedSizeList>
