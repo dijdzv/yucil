@@ -59,12 +59,12 @@ const Row = React.memo(({ data: { playlist, intervalRef }, index, style }: RowPr
 type ListProps = {
   playlist: Playlist;
   index: number;
-  setUrl: Dispatch<SetStateAction<string | undefined>>;
   intervalRef: React.MutableRefObject<NodeJS.Timer | null>;
+  handlePlaylist: (playlist: Playlist, index?: number) => void;
 };
 
 export default function List(props: ListProps) {
-  const { playlist, index, setUrl, intervalRef } = props;
+  const { playlist, index, intervalRef, handlePlaylist } = props;
   const renderItem = getRenderItem(playlist.items);
 
   return (
@@ -74,11 +74,11 @@ export default function List(props: ListProps) {
           subheader={
             <ListSubheader
               onClick={() => {
-                setUrl('');
                 clearInterval(intervalRef.current ?? undefined);
+                handlePlaylist(playlist);
                 setTimeout(() => {
-                  setUrl(BASE_PLAYLIST_URL + playlist.id);
-                }, 350);
+                  handlePlaylist(playlist);
+                }, 200);
               }}
               sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
             >

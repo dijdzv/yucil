@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from 'react';
 import { Box, Card, CardHeader, CardContent, Divider, IconButton, TextField, Toolbar, Slider } from '@mui/material';
 import ReactPlayer from 'react-player/youtube';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
@@ -25,12 +25,17 @@ import { Playlist } from './Dashboard';
 type MusicPlayerProps = {
   url: string | undefined;
   intervalRef: React.MutableRefObject<NodeJS.Timer | null>;
-  children?: React.ReactNode;
 };
 
-export function MusicPlayer(props: MusicPlayerProps) {
+export interface MusicPlayerRefHandle {
+  handlePlaylistAt(index: number): void;
+  handlePlaylist(playlist: Playlist, index?: number): void;
+}
+
+export const MusicPlayer = forwardRef<any, MusicPlayerProps>(function MusicPlayer(props, ref) {
   const { url, intervalRef } = props;
-  const ref = useRef<ReactPlayer>(null);
+
+  const playerRef = useRef<ReactPlayer>(null);
 
   const [playing, setPlaying] = useState(false);
   const [loop, setLoop] = useState(true);
@@ -51,8 +56,33 @@ export function MusicPlayer(props: MusicPlayerProps) {
     return minutes + ':' + ('00' + seconds).slice(-2);
   };
 
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        // shuffleを考慮する
+        handlePlaylistAt(index: number) {
+          playerRef.current?.getInternalPlayer().playVideoAt(index);
+          handlePlaying(true);
+        },
+        handlePlaylist(playlist: Playlist, index?: number) {
+          handlePlaying(false);
+          playerRef.current?.getInternalPlayer().loadPlaylist({
+            list: playlist.id,
+            listType: 'playlist',
+            index: index ?? 0,
+            startSeconds: 0,
+            suggestedQuality: 'small',
+          });
+          handlePlaying(true);
+        },
+      };
+    },
+    []
+  );
+
   const startTimer = () => {
-    const player = ref.current;
+    const player = playerRef.current;
     const currentTime = player?.getCurrentTime() || 0;
     const duration = player?.getDuration() || 0;
     setTime({
@@ -64,7 +94,7 @@ export function MusicPlayer(props: MusicPlayerProps) {
         current: player?.getCurrentTime() || 0,
         duration,
       });
-    }, 500);
+    }, 300);
   };
 
   const stopTimer = () => {
@@ -101,7 +131,7 @@ export function MusicPlayer(props: MusicPlayerProps) {
   };
 
   const handleTime = (time: number) => {
-    ref.current?.seekTo(time);
+    playerRef.current?.seekTo(time);
     handlePlaying(true);
   };
 
@@ -114,33 +144,21 @@ export function MusicPlayer(props: MusicPlayerProps) {
   };
 
   const handleShuffle = () => {
-    ref.current?.getInternalPlayer().setShuffle(!shuffle);
+    playerRef.current?.getInternalPlayer().setShuffle(!shuffle);
     setShuffle((prev) => !prev);
   };
 
   const handleReplay = () => {
-    ref.current?.seekTo(0);
+    playerRef.current?.seekTo(0);
   };
 
   const handlePrevious = () => {
-    ref.current?.getInternalPlayer().previousVideo();
+    playerRef.current?.getInternalPlayer().previousVideo();
     handlePlaying(true);
   };
 
   const handleNext = () => {
-    ref.current?.getInternalPlayer().nextVideo();
-    handlePlaying(true);
-  };
-
-  /**
-   * player.playVideoAt(index:Number):Void
-   * この関数は、再生リストの指定された動画を読み込んで再生します。
-   * index パラメータ（必須）には、再生リスト中の再生する動画のインデックスを指定します。
-   * このパラメータはゼロベース インデックスを使用するため、値 0 はリスト内の最初の動画を指定します。
-   * 再生リストがシャッフルされた場合、この関数は、シャッフルした再生リストの指定された部分を再生します。
-   */
-  const handlePlaylistAt = (index: number) => {
-    ref.current?.getInternalPlayer().playVideoAt(index);
+    playerRef.current?.getInternalPlayer().nextVideo();
     handlePlaying(true);
   };
 
@@ -156,21 +174,11 @@ export function MusicPlayer(props: MusicPlayerProps) {
     setVolume(volume);
   };
 
-  const handlePlaylist = (playlist: Playlist) => {
-    ref.current?.getInternalPlayer().loadPlaylist({
-      list: playlist.id,
-      listType: 'playlist',
-      index: 0,
-      startSeconds: 0,
-      suggestedQuality: 'small',
-    });
-  };
-
   return (
     <Card variant="outlined" sx={{ width: '50%', display: 'flex', flexDirection: 'column' }}>
       <ReactPlayer
         id="music-player"
-        ref={ref}
+        ref={playerRef}
         url={url}
         playing={playing}
         playsinline={true}
@@ -269,4 +277,4 @@ export function MusicPlayer(props: MusicPlayerProps) {
       </CardContent>
     </Card>
   );
-}
+});

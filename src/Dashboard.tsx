@@ -7,7 +7,7 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import Trash from './Trash';
-import { MusicPlayer } from './Player';
+import { MusicPlayer, MusicPlayerRefHandle } from './Player';
 import { getPlaylists } from './api';
 import ReactPlayer from 'react-player/youtube';
 // import { invoke } from '@tauri-apps/api';
@@ -48,10 +48,19 @@ export default function Dashboard() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
   const intervalRef = useRef<NodeJS.Timer | null>(null);
+  const ref = useRef({} as MusicPlayerRefHandle);
 
   useEffect(() => {
     getPlaylists(setPlaylists, setUrl);
   }, []);
+
+  const handlePlaylistAt = (index: number) => {
+    ref.current.handlePlaylistAt(index);
+  };
+
+  const handlePlaylist = (playlist: Playlist, index?: number) => {
+    ref.current.handlePlaylist(playlist, index);
+  };
 
   const reorder = (prev: Playlist[], startIndex: number, startId: number, endIndex: number, endId: number) => {
     const result = prev;
@@ -106,10 +115,16 @@ export default function Dashboard() {
             sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer url={url} intervalRef={intervalRef} />
+              <MusicPlayer url={url} intervalRef={intervalRef} ref={ref} />
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
-                  <List playlist={playlist} index={index} key={playlist.id} setUrl={setUrl} intervalRef={intervalRef} />
+                  <List
+                    playlist={playlist}
+                    index={index}
+                    key={playlist.id}
+                    intervalRef={intervalRef}
+                    handlePlaylist={handlePlaylist}
+                  />
                 ))}
               </Box>
               {/* <Trash /> */}
