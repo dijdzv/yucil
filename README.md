@@ -2,9 +2,9 @@
 
 > ** Youtube extended playlist for comfortable listening to music**
 
- ***incomplete / 未完成***
+***Not completed.***
 
-開発用実行コマンド
+## Dev command
 ```sh
 npm run tauri dev
 ```
