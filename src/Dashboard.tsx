@@ -44,13 +44,13 @@ export default function Dashboard() {
       }),
     [prefersDarkMode]
   );
-  const [url, setUrl] = useState<string>();
+  const [playlist, setPlaylist] = useState<Playlist>();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
   const ref = useRef({} as MusicPlayerRefHandle);
 
   useEffect(() => {
-    getPlaylists(setPlaylists, setUrl);
+    getPlaylists(setPlaylist, setPlaylists);
   }, []);
 
   const handlePlaylistAt = (index: number, oldPlaylist: Playlist, newPlaylist: Playlist) => {
@@ -118,7 +118,7 @@ export default function Dashboard() {
             sx={{ p: 1, mt: '4rem', height: 'calc(100% - 4rem)', position: 'relative', display: 'flex' }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer url={url} ref={ref} />
+              <MusicPlayer playlist={playlist} ref={ref} />
               <Box sx={{ display: 'flex', justifyContent: 'space-evenly', height: '100%' }}>
                 {playlists.map((playlist: Playlist, index: number) => (
                   <List

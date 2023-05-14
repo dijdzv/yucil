@@ -4,8 +4,8 @@ import { Dispatch, SetStateAction } from 'react';
 import { BASE_PLAYLIST_URL, Playlist, PlaylistItem } from './Dashboard';
 
 export function getPlaylists(
-  setPlaylists: Dispatch<SetStateAction<Playlist[]>>,
-  setUrl: Dispatch<SetStateAction<string | undefined>>
+  setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>,
+  setPlaylists: Dispatch<SetStateAction<Playlist[]>>
 ) {
   tokenClient.callback = (resp: any) => {
     if (resp.error !== undefined) {
@@ -64,8 +64,8 @@ export function getPlaylists(
               });
           }) || [];
         Promise.all(playlistsPromise).then((newPlaylists) => {
+          setPlaylist(newPlaylists[0]);
           setPlaylists(newPlaylists);
-          setUrl(BASE_PLAYLIST_URL + newPlaylists[0].id);
         });
       })
       .catch((err) => console.log(err));

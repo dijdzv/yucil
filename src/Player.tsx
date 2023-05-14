@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Box, Card, CardHeader, CardContent, Divider, IconButton, TextField, Toolbar, Slider } from '@mui/material';
 import ReactPlayer from 'react-player/youtube';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
@@ -20,10 +20,10 @@ import Replay10Icon from '@mui/icons-material/Replay10';
 import Replay30Icon from '@mui/icons-material/Replay30';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { OnProgressProps } from 'react-player/base';
-import { Playlist } from './Dashboard';
+import { BASE_PLAYLIST_URL, Playlist } from './Dashboard';
 
 type MusicPlayerProps = {
-  url: string | undefined;
+  playlist: Playlist | undefined;
 };
 
 export interface MusicPlayerRefHandle {
@@ -31,8 +31,8 @@ export interface MusicPlayerRefHandle {
   handlePlaylist(playlist: Playlist, index?: number): void;
 }
 
-export const MusicPlayer = forwardRef<any, MusicPlayerProps>(function MusicPlayer(props, ref) {
-  const { url } = props;
+export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(function MusicPlayer(props, ref) {
+  const { playlist } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
@@ -179,7 +179,7 @@ export const MusicPlayer = forwardRef<any, MusicPlayerProps>(function MusicPlaye
       <ReactPlayer
         id="music-player"
         ref={playerRef}
-        url={url}
+        url={playlist === undefined ? undefined : BASE_PLAYLIST_URL + playlist.id}
         playing={playing}
         playsinline={true}
         loop={loop}

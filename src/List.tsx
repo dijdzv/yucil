@@ -10,7 +10,7 @@ import {
 import { FixedSizeList, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Item from './Item';
-import { BASE_PLAYLIST_URL, Playlist, PlaylistItem } from './Dashboard';
+import { Playlist, PlaylistItem } from './Dashboard';
 
 const getRenderItem =
   (items: PlaylistItem[]) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) =>
