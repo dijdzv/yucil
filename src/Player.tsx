@@ -29,6 +29,7 @@ type MusicPlayerProps = {
 export interface MusicPlayerRefHandle {
   handlePlaylistAt(index: number): void;
   handlePlaying(playing?: boolean): void;
+  isExist(): boolean;
 }
 
 export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(function MusicPlayer(props, ref) {
@@ -62,11 +63,22 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
       return {
         // shuffleを考慮する
         handlePlaylistAt(index: number) {
-          playerRef.current?.getInternalPlayer().playVideoAt(index);
-          handlePlaying(true);
+          const player = playerRef.current?.getInternalPlayer();
+          if (player === undefined) return;
+          const timerId = setInterval(() => {
+            if ('playVideoAt' in player) {
+              player.playVideoAt(index);
+              console.log('handlePlaylistAt: ', index);
+              handlePlaying(true);
+              clearInterval(timerId);
+            }
+          }, 100);
         },
         handlePlaying(playing?: boolean) {
           handlePlaying(playing);
+        },
+        isExist(): boolean {
+          return playerRef.current !== null && playerRef.current.getInternalPlayer() !== null;
         },
       };
     },
@@ -188,7 +200,8 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
         onProgress={(progress) => handleOnProgress(progress)}
       />
       <CardHeader
-        title={title}
+        //! FIXME: titleを元に戻す
+        title={'' && title}
         titleTypographyProps={{
           noWrap: true,
           width: '30vw',

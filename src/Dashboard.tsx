@@ -53,31 +53,32 @@ export default function Dashboard() {
     getPlaylists(setPlaylist, setPlaylists);
   }, []);
 
-  console.log(playlist);
-  /* //TODO:
-   * 異なるプレイリストに変更したとき
-   *  setPlaylist -> 〇, ref.current.handlePlaylistAt -> ×
-   * 同じプレイリストに変更したとき
-   *  setPlaylist -> ×, ref.current.handlePlaylistAt -> 〇
-   */
+  console.log('playlist change: ', playlist);
+
+  // TODO: setTimeoutやsetIntervalを使わない方法を考える
+  // TODO: handleOnReadyを使う
   const handlePlaylistAt = (newPlaylist: Playlist, index: number) => {
-    newPlaylist.index = index;
-    console.log(playlist?.id, newPlaylist.id);
     if (playlist?.id === newPlaylist.id) {
-      console.log(playlist?.index, newPlaylist.index);
-      playlist.index !== newPlaylist.index && setPlaylist(newPlaylist);
-      ref.current.handlePlaylistAt(index);
+      if (playlist.index !== index) {
+        setPlaylist((prev: Playlist | undefined): Playlist | undefined => {
+          return { ...prev, index } as Playlist;
+        });
+        ref.current.handlePlaylistAt(index);
+      }
     } else {
-      handlePlaylist(newPlaylist, () => ref.current.handlePlaylistAt(index));
+      handlePlaylist({ ...newPlaylist, index });
+      setTimeout(() => {
+        ref.current.handlePlaylistAt(index);
+      }, 1000);
     }
   };
 
-  const handlePlaylist = (newPlaylist?: Playlist, fn?: () => void) => {
+  const handlePlaylist = (newPlaylist?: Playlist) => {
+    if (playlist?.id === newPlaylist?.id) return;
     setPlaylist(undefined);
     setTimeout(() => {
       setPlaylist(newPlaylist);
       ref.current.handlePlaying(true);
-      fn && fn();
     }, 200);
   };
 

@@ -66,7 +66,7 @@ export function getPlaylists(
               });
           }) || [];
         Promise.all(playlistsPromise).then((newPlaylists) => {
-          setPlaylist(newPlaylists[0]);
+          setPlaylist({ ...newPlaylists[0] });
           setPlaylists(newPlaylists);
         });
       })

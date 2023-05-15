@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import { Box, List as MuiList, Card, CardContent, ListSubheader } from '@mui/material';
 import {
   Droppable,
@@ -41,13 +41,7 @@ const Row = React.memo(({ data: { playlist, handlePlaylistAt }, index, style }: 
   const renderItem = getRenderItem(playlist.items);
 
   return (
-    <Box
-      sx={style}
-      key={index + playlistItem.id}
-      onClick={() => {
-        handlePlaylistAt(playlist, index);
-      }}
-    >
+    <Box sx={style} key={index + playlistItem.id} onClick={() => handlePlaylistAt(playlist, index)}>
       <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
         {renderItem}
       </Draggable>
