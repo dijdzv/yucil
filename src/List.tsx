@@ -29,19 +29,19 @@ const getRenderItem =
 
 type RowProps = {
   data: {
-    playlist: Playlist;
+    playlistsItem: Playlist;
     handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
   };
   index: number;
   style: Object;
 };
 
-const Row = React.memo(({ data: { playlist, handlePlaylistAt }, index, style }: RowProps) => {
-  const playlistItem = playlist.items[index];
-  const renderItem = getRenderItem(playlist.items);
+const Row = React.memo(({ data: { playlistsItem, handlePlaylistAt }, index, style }: RowProps) => {
+  const playlistItem = playlistsItem.items[index];
+  const renderItem = getRenderItem(playlistsItem.items);
 
   return (
-    <Box sx={style} key={index + playlistItem.id} onClick={() => handlePlaylistAt(playlist, index)}>
+    <Box sx={style} key={index + playlistItem.id} onClick={() => handlePlaylistAt(playlistsItem, index)}>
       <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
         {renderItem}
       </Draggable>
@@ -50,15 +50,15 @@ const Row = React.memo(({ data: { playlist, handlePlaylistAt }, index, style }: 
 }, areEqual);
 
 type ListProps = {
-  playlist: Playlist;
+  playlistsItem: Playlist;
   index: number;
-  handlePlaylist: (newPlaylist?: Playlist, fn?: () => void) => void;
+  handlePlaylist: (newPlaylist?: Playlist) => void;
   handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
 };
 
 export default function List(props: ListProps) {
-  const { playlist, index, handlePlaylist, handlePlaylistAt } = props;
-  const renderItem = getRenderItem(playlist.items);
+  const { playlistsItem, index, handlePlaylist, handlePlaylistAt } = props;
+  const renderItem = getRenderItem(playlistsItem.items);
 
   return (
     <Card variant="outlined" sx={{ minHeight: '17rem', maxHeight: '100%', width: '25%' }}>
@@ -66,10 +66,10 @@ export default function List(props: ListProps) {
         <MuiList
           subheader={
             <ListSubheader
-              onClick={() => handlePlaylist(playlist)}
+              onClick={() => handlePlaylist(playlistsItem)}
               sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
             >
-              {playlist.title}
+              {playlistsItem.title}
             </ListSubheader>
           }
           sx={{ height: '100%' }}
@@ -80,11 +80,11 @@ export default function List(props: ListProps) {
                 {({ height, width }) => (
                   <FixedSizeList
                     height={height ?? 0}
-                    itemCount={playlist.items.length}
+                    itemCount={playlistsItem.items.length}
                     itemSize={48.48}
                     width={width ?? 0}
                     outerRef={provided.innerRef}
-                    itemData={{ playlist, handlePlaylistAt }}
+                    itemData={{ playlistsItem, handlePlaylistAt }}
                   >
                     {Row}
                   </FixedSizeList>

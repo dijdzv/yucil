@@ -145,11 +145,11 @@ export default function Dashboard() {
           >
             <DragDropContext onDragEnd={onDragEnd}>
               <MusicPlayer playlist={playlist} ref={ref} />
-              {playlists.map((playlist: Playlist, index: number) => (
+              {playlists.map((playlistsItem: Playlist, index: number) => (
                 <List
-                  playlist={playlist}
+                  playlistsItem={playlistsItem}
                   index={index}
-                  key={playlist.id}
+                  key={playlistsItem.id}
                   handlePlaylist={handlePlaylist}
                   handlePlaylistAt={handlePlaylistAt}
                 />
