@@ -67,9 +67,11 @@ export default function List(props: ListProps) {
   const { playlist, playlistsItem, index, handlePlaylist, handlePlaylistAt } = props;
   const renderItem = getRenderItem(playlistsItem.items);
 
+  const itemSize = 48.48;
+
   return (
     <Card variant="outlined" sx={{ minHeight: '17rem', maxHeight: '100%', width: '25%' }}>
-      <CardContent sx={{ p: 1, height: '100%' }}>
+      <CardContent sx={{ p: 1, height: '100%', pb: '8px !important' }}>
         <MuiList
           subheader={
             <ListSubheader
@@ -80,26 +82,28 @@ export default function List(props: ListProps) {
               {playlistsItem.title}
             </ListSubheader>
           }
-          sx={{ height: '100%' }}
+          sx={{ height: '100%', pb: 0 }}
         >
-          <Droppable droppableId={index.toString()} renderClone={renderItem} mode="virtual">
-            {(provided) => (
-              <AutoSizer>
-                {({ height, width }) => (
-                  <FixedSizeList
-                    height={height ?? 0}
-                    itemCount={playlistsItem.items.length}
-                    itemSize={48.48}
-                    width={width ?? 0}
-                    outerRef={provided.innerRef}
-                    itemData={{ playlist, playlistsItem, handlePlaylistAt }}
-                  >
-                    {Row}
-                  </FixedSizeList>
-                )}
-              </AutoSizer>
-            )}
-          </Droppable>
+          <Box sx={{ height: 'calc(100% - 45px)' }}>
+            <Droppable droppableId={index.toString()} renderClone={renderItem} mode="virtual">
+              {(provided) => (
+                <AutoSizer>
+                  {({ height, width }) => (
+                    <FixedSizeList
+                      height={height ?? 0}
+                      itemCount={playlistsItem.items.length}
+                      itemSize={itemSize}
+                      width={width ?? 0}
+                      outerRef={provided.innerRef}
+                      itemData={{ playlist, playlistsItem, handlePlaylistAt }}
+                    >
+                      {Row}
+                    </FixedSizeList>
+                  )}
+                </AutoSizer>
+              )}
+            </Droppable>
+          </Box>
         </MuiList>
       </CardContent>
     </Card>
