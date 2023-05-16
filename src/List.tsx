@@ -29,6 +29,7 @@ const getRenderItem =
 
 type RowProps = {
   data: {
+    playlist: Playlist | undefined;
     playlistsItem: Playlist;
     handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
   };
@@ -36,12 +37,17 @@ type RowProps = {
   style: Object;
 };
 
-const Row = React.memo(({ data: { playlistsItem, handlePlaylistAt }, index, style }: RowProps) => {
+const Row = React.memo(({ data: { playlist, playlistsItem, handlePlaylistAt }, index, style }: RowProps) => {
   const playlistItem = playlistsItem.items[index];
   const renderItem = getRenderItem(playlistsItem.items);
 
   return (
-    <Box sx={style} key={index + playlistItem.id} onClick={() => handlePlaylistAt(playlistsItem, index)}>
+    <Box
+      sx={style}
+      className={playlist?.id === playlistsItem.id && playlist?.index === index ? 'yucil-2' : ''}
+      key={index + playlistItem.id}
+      onClick={() => handlePlaylistAt(playlistsItem, index)}
+    >
       <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
         {renderItem}
       </Draggable>
@@ -50,6 +56,7 @@ const Row = React.memo(({ data: { playlistsItem, handlePlaylistAt }, index, styl
 }, areEqual);
 
 type ListProps = {
+  playlist: Playlist | undefined;
   playlistsItem: Playlist;
   index: number;
   handlePlaylist: (newPlaylist?: Playlist) => void;
@@ -57,7 +64,7 @@ type ListProps = {
 };
 
 export default function List(props: ListProps) {
-  const { playlistsItem, index, handlePlaylist, handlePlaylistAt } = props;
+  const { playlist, playlistsItem, index, handlePlaylist, handlePlaylistAt } = props;
   const renderItem = getRenderItem(playlistsItem.items);
 
   return (
@@ -68,6 +75,7 @@ export default function List(props: ListProps) {
             <ListSubheader
               onClick={() => handlePlaylist(playlistsItem)}
               sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
+              className={playlist?.id === playlistsItem.id ? 'yucil-1' : ''}
             >
               {playlistsItem.title}
             </ListSubheader>
@@ -84,7 +92,7 @@ export default function List(props: ListProps) {
                     itemSize={48.48}
                     width={width ?? 0}
                     outerRef={provided.innerRef}
-                    itemData={{ playlistsItem, handlePlaylistAt }}
+                    itemData={{ playlist, playlistsItem, handlePlaylistAt }}
                   >
                     {Row}
                   </FixedSizeList>

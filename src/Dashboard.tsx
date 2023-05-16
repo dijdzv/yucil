@@ -147,6 +147,7 @@ export default function Dashboard() {
               <MusicPlayer playlist={playlist} ref={ref} />
               {playlists.map((playlistsItem: Playlist, index: number) => (
                 <List
+                  playlist={playlist}
                   playlistsItem={playlistsItem}
                   index={index}
                   key={playlistsItem.id}
