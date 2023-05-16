@@ -57,7 +57,8 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
     return minutes + ':' + ('00' + seconds).slice(-2);
   };
 
-  // TODO: player側で自動で次に行くとき、setPlaylistとhandlePlaylistATでやる
+  // TODO: player側で自動で次に行くとき、setPlaylistを使う
+  // TODO: handleNext, handlePreviousの時にsetPlaylistを使う
 
   useImperativeHandle(
     ref,
@@ -88,6 +89,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   );
 
   const startTimer = () => {
+    console.log('startTimer');
     const player = playerRef.current;
     const currentTime = player?.getCurrentTime() || 0;
     const duration = player?.getDuration() || 0;
@@ -104,6 +106,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   };
 
   const stopTimer = () => {
+    console.log('stopTimer');
     clearInterval(intervalRef.current ?? undefined);
     intervalRef.current = null;
   };
@@ -121,8 +124,8 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   };
 
   const handleOnPlay = () => {
-    intervalRef.current !== null && stopTimer();
     console.log('handleOnPlay');
+    intervalRef.current !== null && stopTimer();
     intervalRef.current === null && startTimer();
     handleTitle();
   };
@@ -161,20 +164,24 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   };
 
   const handleReplay = () => {
+    console.log('handleReplay');
     playerRef.current?.seekTo(0);
   };
 
   const handlePrevious = () => {
+    console.log('handlePrevious');
     playerRef.current?.getInternalPlayer().previousVideo();
     handlePlaying(true);
   };
 
   const handleNext = () => {
+    console.log('handleNext');
     playerRef.current?.getInternalPlayer().nextVideo();
     handlePlaying(true);
   };
 
   const handlePlaying = (playing?: boolean) => {
+    console.log('handlePlaying', playing);
     playing !== undefined ? setPlaying(playing) : setPlaying((prev) => !prev);
   };
 

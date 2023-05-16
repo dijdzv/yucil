@@ -10,7 +10,7 @@ export default function Item(props: any) {
         sx={{ bgcolor: isDragging ? '#4d4d4d' : '#121212', outline: 'solid 1px rgba(255, 255, 255, 0.12)' }}
       >
         <ListItemButton sx={{ p: 0 }}>
-          <CardMedia image={thumbnail} sx={{ width: 60, height: 45, mr: 1 }} />
+          <CardMedia image={thumbnail} sx={{ minWidth: 60, minHeight: 45, mr: 1 }} />
           <ListItemText
             primary={name}
             primaryTypographyProps={{ overflow: 'hidden', noWrap: true, fontSize: '0.9rem' }}
