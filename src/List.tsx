@@ -79,10 +79,10 @@ export default function List(props: ListProps) {
               <AutoSizer>
                 {({ height, width }) => (
                   <FixedSizeList
-                    height={height}
+                    height={height ?? 0}
                     itemCount={playlist.items.length}
                     itemSize={48.48}
-                    width={width}
+                    width={width ?? 0}
                     outerRef={provided.innerRef}
                     itemData={{ playlist, handlePlaylistAt }}
                   >
