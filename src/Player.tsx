@@ -57,6 +57,8 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
     return minutes + ':' + ('00' + seconds).slice(-2);
   };
 
+  // TODO: player側で自動で次に行くとき、setPlaylistとhandlePlaylistATでやる
+
   useImperativeHandle(
     ref,
     () => {
@@ -112,12 +114,15 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   };
 
   const handleOnReady = () => {
+    console.log('handleOnReady');
     stopTimer();
     handleTitle();
     startTimer();
   };
 
   const handleOnPlay = () => {
+    intervalRef.current !== null && stopTimer();
+    console.log('handleOnPlay');
     intervalRef.current === null && startTimer();
     handleTitle();
   };
@@ -127,11 +132,13 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   };
 
   const handleOnEnded = () => {
+    console.log('handleOnEnded');
     stopTimer();
-    handlePlaying();
+    handlePlaying(false);
   };
 
   const handleOnPause = () => {
+    console.log('handleOnPause');
     stopTimer();
   };
 
