@@ -67,8 +67,6 @@ export default function List(props: ListProps) {
   const { playlist, playlistsItem, index, handlePlaylist, handlePlaylistAt } = props;
   const renderItem = getRenderItem(playlistsItem.items);
 
-  const itemSize = 48.48;
-
   return (
     <Card variant="outlined" sx={{ minHeight: '17rem', maxHeight: '100%', width: '25%' }}>
       <CardContent sx={{ p: 1, height: '100%', pb: '8px !important' }}>
@@ -92,7 +90,7 @@ export default function List(props: ListProps) {
                     <FixedSizeList
                       height={height ?? 0}
                       itemCount={playlistsItem.items.length}
-                      itemSize={itemSize}
+                      itemSize={48.48}
                       width={width ?? 0}
                       outerRef={provided.innerRef}
                       itemData={{ playlist, playlistsItem, handlePlaylistAt }}

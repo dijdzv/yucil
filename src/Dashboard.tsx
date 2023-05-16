@@ -50,6 +50,7 @@ export default function Dashboard() {
   const ref = useRef({} as MusicPlayerRefHandle);
 
   useEffect(() => {
+    // TODO: playlistItemがすべて取得できていない
     getPlaylists(setPlaylist, setPlaylists);
   }, []);
 
@@ -60,7 +61,7 @@ export default function Dashboard() {
   const handlePlaylistAt = (newPlaylist: Playlist, index: number) => {
     if (playlist?.id === newPlaylist.id) {
       if (playlist.index !== index) {
-        setPlaylist((prev: Playlist | undefined): Playlist | undefined => {
+        setPlaylist((prev) => {
           return { ...prev, index } as Playlist;
         });
         ref.current.handlePlaylistAt(index);
@@ -103,14 +104,14 @@ export default function Dashboard() {
     }
 
     if (destination.droppableId === 'trash') {
-      setPlaylists((prev: Playlist[]) => {
+      setPlaylists((prev) => {
         prev[Number(source.droppableId)].items.splice(source.index, 1);
         return prev;
       });
       return;
     }
 
-    setPlaylists((prev: Playlist[]) =>
+    setPlaylists((prev) =>
       reorder(prev, source.index, Number(source.droppableId), destination.index, Number(destination.droppableId))
     );
   };
@@ -144,7 +145,7 @@ export default function Dashboard() {
             }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
-              <MusicPlayer playlist={playlist} ref={ref} />
+              <MusicPlayer playlist={playlist} setPlaylist={setPlaylist} ref={ref} />
               {playlists.map((playlistsItem: Playlist, index: number) => (
                 <List
                   playlist={playlist}

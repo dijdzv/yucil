@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState, Dispatch, SetStateAction } from 'react';
 import { Box, Card, CardHeader, CardContent, Divider, IconButton, TextField, Toolbar, Slider } from '@mui/material';
 import ReactPlayer from 'react-player/youtube';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
@@ -24,6 +24,7 @@ import { BASE_PLAYLIST_URL, Playlist } from './Dashboard';
 
 type MusicPlayerProps = {
   playlist: Playlist | undefined;
+  setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>;
 };
 
 export interface MusicPlayerRefHandle {
@@ -33,7 +34,7 @@ export interface MusicPlayerRefHandle {
 }
 
 export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(function MusicPlayer(props, ref) {
-  const { playlist } = props;
+  const { playlist, setPlaylist } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
@@ -58,7 +59,6 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   };
 
   // TODO: player側で自動で次に行くとき、setPlaylistを使う
-  // TODO: handleNext, handlePreviousの時にsetPlaylistを使う
 
   useImperativeHandle(
     ref,
@@ -170,13 +170,23 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
 
   const handlePrevious = () => {
     console.log('handlePrevious');
-    playerRef.current?.getInternalPlayer().previousVideo();
+    const now = playlist?.index;
+    const previous = now === undefined || now === 0 ? playlist?.items.length : now - 1;
+    playerRef.current?.getInternalPlayer().playVideoAt(previous);
+    setPlaylist((prev) => {
+      return { ...prev, index: previous } as Playlist;
+    });
     handlePlaying(true);
   };
 
   const handleNext = () => {
     console.log('handleNext');
-    playerRef.current?.getInternalPlayer().nextVideo();
+    const now = playlist?.index;
+    const next = now === undefined || now === playlist?.items.length ? 0 : now + 1;
+    playerRef.current?.getInternalPlayer().playVideoAt(next);
+    setPlaylist((prev) => {
+      return { ...prev, index: next } as Playlist;
+    });
     handlePlaying(true);
   };
 
