@@ -216,7 +216,6 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
         onProgress={(progress) => handleOnProgress(progress)}
       />
       <CardHeader
-        //! FIXME
         title={playlist?.items.at(playlist.index)?.title}
         titleTypographyProps={{
           noWrap: true,

@@ -21,8 +21,6 @@ export function getPlaylists(
         maxResults: 50,
       })
       .then((playlistsResponse) => {
-        console.log('playlistResponse', playlistsResponse);
-
         const playlists = playlistsResponse.result.items;
         playlists?.sort((a, b) => {
           return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
@@ -37,7 +35,7 @@ export function getPlaylists(
               })
               .then((playlistItemListResponse) => {
                 // TODO: playlistItemListResponse.result.pageInfo.totalResultsの回数取得するようにする
-                console.log('playlistItemListResponse', playlistItemListResponse);
+                // console.log('playlistItemListResponse', playlistItemListResponse);
 
                 const playlistItems = playlistItemListResponse.result.items;
 
@@ -112,19 +110,23 @@ export function UpdatePlaylistItems(playlistItem: PlaylistItem) {
     .update({
       part: 'snippet',
       resource: {
-        // PlaylistItem id
-        id: '',
+        id: playlistItem.id,
         snippet: {
           playlistId: playlistItem.playlistId,
           resourceId: {
             channelId: playlistItem.channelId,
-            // kind: '',
+            kind: playlistItem.resourceId.kind,
             // playlistId: '',
-            videoId: playlistItem.id,
+            videoId: playlistItem.resourceId.videoId,
           },
           position: playlistItem.position,
         },
       },
     })
-    .then((res) => {});
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }

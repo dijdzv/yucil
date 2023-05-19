@@ -90,8 +90,10 @@ export default function Dashboard() {
     return result;
   };
 
+  // TODO: playlistItem.updateを動かす
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
+    console.log(source, destination);
 
     const isNotDropped = !destination;
     if (isNotDropped) {

@@ -13,19 +13,24 @@ import Item from './Item';
 import { Playlist, PlaylistItem } from './Dashboard';
 
 const getRenderItem =
-  (items: PlaylistItem[]) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) =>
-    (
+  (items: PlaylistItem[]) =>
+  (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) => {
+    const item = items[rubric.source.index];
+    console.log(item.title);
+
+    return (
       <Item
         innerRef={provided.innerRef}
         provided={provided}
-        name={items[rubric.source.index].title}
-        thumbnail={items[rubric.source.index].thumbnail}
-        channel={items[rubric.source.index].channelTitle}
-        position={items[rubric.source.index].position}
-        playlistId={items[rubric.source.index].playlistId}
+        name={item.title}
+        thumbnail={item.thumbnail}
+        channel={item.channelTitle}
+        position={item.position}
+        playlistId={item.playlistId}
         isDragging={snapshot.isDragging}
       />
     );
+  };
 
 type RowProps = {
   data: {
@@ -48,7 +53,7 @@ const Row = React.memo(({ data: { playlist, playlistsItem, handlePlaylistAt }, i
       key={index + playlistItem.id}
       onClick={() => handlePlaylistAt(playlistsItem, index)}
     >
-      <Draggable draggableId={index + playlistItem.id} index={index} key={index + playlistItem.id}>
+      <Draggable draggableId={playlistItem.id + '-' + index} index={index} key={playlistItem.id + '-' + index}>
         {renderItem}
       </Draggable>
     </Box>
