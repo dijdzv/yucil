@@ -18,6 +18,7 @@ export function getPlaylists(
       .list({
         part: 'snippet',
         mine: true,
+        maxResults: 50,
       })
       .then((playlistsResponse) => {
         const playlists = playlistsResponse.result.items;
@@ -30,6 +31,7 @@ export function getPlaylists(
               .list({
                 part: 'snippet',
                 playlistId: playlist.id,
+                maxResults: 50,
               })
               .then((playlistItemListResponse) => {
                 const playlistItems = playlistItemListResponse.result.items;

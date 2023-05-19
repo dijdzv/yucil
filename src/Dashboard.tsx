@@ -50,7 +50,6 @@ export default function Dashboard() {
   const ref = useRef({} as MusicPlayerRefHandle);
 
   useEffect(() => {
-    // TODO: playlistItemがすべて取得できていない
     getPlaylists(setPlaylist, setPlaylists);
   }, []);
 
