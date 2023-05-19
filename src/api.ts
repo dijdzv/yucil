@@ -21,6 +21,8 @@ export function getPlaylists(
         maxResults: 50,
       })
       .then((playlistsResponse) => {
+        console.log('playlistResponse', playlistsResponse);
+
         const playlists = playlistsResponse.result.items;
         playlists?.sort((a, b) => {
           return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
@@ -34,14 +36,19 @@ export function getPlaylists(
                 maxResults: 50,
               })
               .then((playlistItemListResponse) => {
+                // TODO: playlistItemListResponse.result.pageInfo.totalResultsの回数取得するようにする
+                console.log('playlistItemListResponse', playlistItemListResponse);
+
                 const playlistItems = playlistItemListResponse.result.items;
+
                 const newPlaylistItems: PlaylistItem[] =
                   playlistItems?.map((playlistItem) => {
                     return {
                       id: playlistItem.id || 'undefined',
                       title: playlistItem.snippet?.title || 'undefined',
                       thumbnail: playlistItem.snippet?.thumbnails?.default?.url || '',
-                      channel: playlistItem.snippet?.videoOwnerChannelTitle || 'undefined',
+                      channelId: playlistItem.snippet?.videoOwnerChannelId || 'undefined',
+                      channelTitle: playlistItem.snippet?.videoOwnerChannelTitle || 'undefined',
                       position: playlistItem.snippet?.position || 0,
                       resourceId: {
                         kind: playlistItem.snippet?.resourceId?.kind || '',
@@ -90,12 +97,34 @@ export function getPlaylists(
   }
 }
 
-export function revokeToken() {
-  let cred = gapi.client.getToken();
-  if (cred !== null) {
-    google.accounts.oauth2.revoke(cred.access_token, () => {
-      console.log('Revoked: ' + cred.access_token);
-    });
-    gapi.client.setToken(null);
-  }
+// export function revokeToken() {
+//   let cred = gapi.client.getToken();
+//   if (cred !== null) {
+//     google.accounts.oauth2.revoke(cred.access_token, () => {
+//       console.log('Revoked: ' + cred.access_token);
+//     });
+//     gapi.client.setToken(null);
+//   }
+// }
+
+export function UpdatePlaylistItems(playlistItem: PlaylistItem) {
+  gapi.client.youtube.playlistItems
+    .update({
+      part: 'snippet',
+      resource: {
+        // PlaylistItem id
+        id: '',
+        snippet: {
+          playlistId: playlistItem.playlistId,
+          resourceId: {
+            channelId: playlistItem.channelId,
+            // kind: '',
+            // playlistId: '',
+            videoId: playlistItem.id,
+          },
+          position: playlistItem.position,
+        },
+      },
+    })
+    .then((res) => {});
 }

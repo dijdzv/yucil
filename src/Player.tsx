@@ -45,7 +45,6 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
   const [volume, setVolume] = useState(0.3);
   const [muted, setMuted] = useState(false);
   const [time, setTime] = useState({ current: 0, duration: 0 });
-  const [title, setTitle] = useState<string | null | undefined>();
   const [shuffle, setShuffle] = useState(false);
 
   const opacity = (condition: boolean): object => ({
@@ -111,15 +110,9 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
     intervalRef.current = null;
   };
 
-  const handleTitle = () => {
-    const iframe = document.querySelector('#music-player')?.querySelector('iframe');
-    setTitle(iframe?.getAttribute('title'));
-  };
-
   const handleOnReady = () => {
     console.log('handleOnReady');
     stopTimer();
-    handleTitle();
     startTimer();
   };
 
@@ -127,7 +120,6 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
     console.log('handleOnPlay');
     intervalRef.current !== null && stopTimer();
     intervalRef.current === null && startTimer();
-    handleTitle();
   };
 
   const handleOnProgress = (progress: OnProgressProps) => {
@@ -225,7 +217,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
       />
       <CardHeader
         //! FIXME
-        title={'' && title}
+        title={playlist?.items.at(playlist.index)?.title}
         titleTypographyProps={{
           noWrap: true,
           width: '30vw',

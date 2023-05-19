@@ -24,7 +24,8 @@ export type PlaylistItem = {
   id: string;
   title: string;
   thumbnail: string;
-  channel: string;
+  channelId: string;
+  channelTitle: string;
   position: number;
   resourceId: {
     kind: string;
