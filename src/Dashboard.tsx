@@ -114,15 +114,21 @@ export default function Dashboard() {
 
     if (destination.droppableId === 'trash') {
       setPlaylists((prev) => {
-        updatePlaylistItems(prev, source, destination);
+        const isSuccess = updatePlaylistItems(prev, source, destination);
+        if (isSuccess) {
+          prev.find((p) => p.id === source.droppableId)?.items.splice(source.index, 1);
+        }
         return prev;
       });
       return;
     }
 
     setPlaylists((prev) => {
-      updatePlaylistItems(prev, source, destination);
-      return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
+      const isSuccess = updatePlaylistItems(prev, source, destination);
+      if (isSuccess) {
+        return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
+      }
+      return prev;
     });
   };
 

@@ -106,10 +106,14 @@ export function getPlaylists(
 //   }
 // }
 
-export function updatePlaylistItems(playlists: Playlist[], source: DraggableLocation, destination: DraggableLocation) {
+export function updatePlaylistItems(
+  playlists: Playlist[],
+  source: DraggableLocation,
+  destination: DraggableLocation
+): boolean {
   const sourcePlaylist = playlists.find((playlist) => playlist.id === source.droppableId);
   const destinationPlaylist = playlists.find((playlist) => playlist.id === destination.droppableId);
-  if (!sourcePlaylist || !destinationPlaylist) return;
+  if (!sourcePlaylist || !destinationPlaylist) return false;
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
   gapi.client.youtube.playlistItems
@@ -134,5 +138,7 @@ export function updatePlaylistItems(playlists: Playlist[], source: DraggableLoca
     })
     .catch((err) => {
       console.log(err);
+      return false;
     });
+  return true;
 }
