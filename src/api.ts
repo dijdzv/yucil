@@ -2,6 +2,7 @@ declare let tokenClient: any;
 declare const google: any;
 import { Dispatch, SetStateAction } from 'react';
 import { Playlist, PlaylistItem } from './Dashboard';
+import { DraggableLocation } from 'react-beautiful-dnd';
 
 export function getPlaylists(
   setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>,
@@ -105,21 +106,26 @@ export function getPlaylists(
 //   }
 // }
 
-export function UpdatePlaylistItems(playlistItem: PlaylistItem) {
+export function updatePlaylistItems(playlists: Playlist[], source: DraggableLocation, destination: DraggableLocation) {
+  const sourcePlaylist = playlists.find((playlist) => playlist.id === source.droppableId);
+  const destinationPlaylist = playlists.find((playlist) => playlist.id === destination.droppableId);
+  if (!sourcePlaylist || !destinationPlaylist) return;
+  const sourcePlaylistItem = sourcePlaylist.items[source.index];
+  const destinationPlaylistItem = destinationPlaylist.items[destination.index];
   gapi.client.youtube.playlistItems
     .update({
       part: 'snippet',
       resource: {
-        id: playlistItem.id,
+        id: sourcePlaylistItem.id,
         snippet: {
-          playlistId: playlistItem.playlistId,
+          playlistId: destinationPlaylistItem.playlistId,
           resourceId: {
-            channelId: playlistItem.channelId,
-            kind: playlistItem.resourceId.kind,
-            // playlistId: '',
-            videoId: playlistItem.resourceId.videoId,
+            channelId: sourcePlaylistItem.channelId,
+            kind: sourcePlaylistItem.resourceId.kind,
+            playlistId: sourcePlaylistItem.playlistId,
+            videoId: sourcePlaylistItem.resourceId.videoId,
           },
-          position: playlistItem.position,
+          position: destinationPlaylistItem.position,
         },
       },
     })

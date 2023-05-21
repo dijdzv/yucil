@@ -8,7 +8,7 @@ import Bar from './Bar';
 import List from './List';
 import Trash from './Trash';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
-import { getPlaylists } from './api';
+import { getPlaylists, updatePlaylistItems } from './api';
 // import { invoke } from '@tauri-apps/api';
 
 export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
@@ -96,7 +96,7 @@ export default function Dashboard() {
     return result;
   };
 
-  // TODO: playlistItem.updateを動かす
+  //! FIXME: 異なるプレイリストに移動できない
   // TODO: 選択している動画が変わらないようにする
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -106,24 +106,28 @@ export default function Dashboard() {
       return;
     }
 
-    const isSamePosition = source.droppableId === destination.droppableId && source.index === destination.index;
-    if (isSamePosition) {
-      return;
-    }
-
     const PLAYLIST_ID_LENGTH = 34;
     source.droppableId = source.droppableId.substring(0, PLAYLIST_ID_LENGTH);
     destination.droppableId = destination?.droppableId.substring(0, PLAYLIST_ID_LENGTH);
 
+    const isSamePlaylist = source.droppableId === destination.droppableId;
+    const isSamePosition = isSamePlaylist && source.index === destination.index;
+    if (isSamePosition) {
+      return;
+    }
+
     if (destination.droppableId === 'trash') {
       setPlaylists((prev) => {
-        prev.find((p) => p.id === source.droppableId)?.items.splice(source.index, 1);
+        updatePlaylistItems(prev, source, destination);
         return prev;
       });
       return;
     }
 
-    setPlaylists((prev) => reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId));
+    setPlaylists((prev) => {
+      updatePlaylistItems(prev, source, destination);
+      return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
+    });
   };
 
   return (
