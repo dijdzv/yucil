@@ -16,7 +16,6 @@ const getRenderItem =
   (items: PlaylistItem[]) =>
   (provided: DraggableProvided, snapshot: DraggableStateSnapshot, rubric: DraggableRubric) => {
     const item = items[rubric.source.index];
-    console.log(item.title);
 
     return (
       <Item
@@ -53,7 +52,7 @@ const Row = React.memo(({ data: { playlist, playlistsItem, handlePlaylistAt }, i
       key={index + playlistItem.id}
       onClick={() => handlePlaylistAt(playlistsItem, index)}
     >
-      <Draggable draggableId={playlistItem.id + '-' + index} index={index} key={playlistItem.id + '-' + index}>
+      <Draggable draggableId={playlistItem.id} index={index} key={playlistItem.id}>
         {renderItem}
       </Draggable>
     </Box>
@@ -88,7 +87,7 @@ export default function List(props: ListProps) {
           sx={{ height: '100%', pb: 0 }}
         >
           <Box sx={{ height: 'calc(100% - 45px)' }}>
-            <Droppable droppableId={index.toString()} renderClone={renderItem} mode="virtual">
+            <Droppable droppableId={playlist?.id + '-' + index.toString()} renderClone={renderItem} mode="virtual">
               {(provided) => (
                 <AutoSizer>
                   {({ height, width }) => (

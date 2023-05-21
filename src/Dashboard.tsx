@@ -83,17 +83,23 @@ export default function Dashboard() {
     }, 200);
   };
 
-  const reorder = (prev: Playlist[], startIndex: number, startId: number, endIndex: number, endId: number) => {
+  const reorder = (prev: Playlist[], startIndex: number, startId: string, endIndex: number, endId: string) => {
     const result = prev;
-    const [removed] = result[startId].items.splice(startIndex, 1);
-    result[endId].items.splice(endIndex, 0, removed);
+    const startPlaylist = result.find((p) => p.id === startId);
+    if (startPlaylist === undefined) {
+      console.log('filed reorder', result);
+      return result;
+    }
+    const [removed] = startPlaylist.items.splice(startIndex, 1);
+    result.find((p) => p.id === endId)?.items.splice(endIndex, 0, removed);
+    console.log('reorder', result);
     return result;
   };
 
   // TODO: playlistItem.updateを動かす
+  // TODO: 選択している動画が変わらないようにする
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
-    console.log(source, destination);
 
     const isNotDropped = !destination;
     if (isNotDropped) {
@@ -105,17 +111,19 @@ export default function Dashboard() {
       return;
     }
 
+    const PLAYLIST_ID_LENGTH = 34;
+    source.droppableId = source.droppableId.substring(0, PLAYLIST_ID_LENGTH);
+    destination.droppableId = destination?.droppableId.substring(0, PLAYLIST_ID_LENGTH);
+
     if (destination.droppableId === 'trash') {
       setPlaylists((prev) => {
-        prev[Number(source.droppableId)].items.splice(source.index, 1);
+        prev.find((p) => p.id === source.droppableId)?.items.splice(source.index, 1);
         return prev;
       });
       return;
     }
 
-    setPlaylists((prev) =>
-      reorder(prev, source.index, Number(source.droppableId), destination.index, Number(destination.droppableId))
-    );
+    setPlaylists((prev) => reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId));
   };
 
   return (
