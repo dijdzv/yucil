@@ -87,7 +87,7 @@ export default function List(props: ListProps) {
           sx={{ height: '100%', pb: 0 }}
         >
           <Box sx={{ height: 'calc(100% - 45px)' }}>
-            <Droppable droppableId={playlist?.id + '-' + index.toString()} renderClone={renderItem} mode="virtual">
+            <Droppable droppableId={playlistsItem?.id} renderClone={renderItem} mode="virtual">
               {(provided) => (
                 <AutoSizer>
                   {({ height, width }) => (

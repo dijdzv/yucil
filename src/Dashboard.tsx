@@ -106,10 +106,6 @@ export default function Dashboard() {
       return;
     }
 
-    const PLAYLIST_ID_LENGTH = 34;
-    source.droppableId = source.droppableId.substring(0, PLAYLIST_ID_LENGTH);
-    destination.droppableId = destination?.droppableId.substring(0, PLAYLIST_ID_LENGTH);
-
     const isSamePlaylist = source.droppableId === destination.droppableId;
     const isSamePosition = isSamePlaylist && source.index === destination.index;
     if (isSamePosition) {
