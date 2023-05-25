@@ -136,7 +136,12 @@ export default function Dashboard() {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <Bar playlists={playlists} handlePlaylist={handlePlaylist} />
+        <Bar
+          playlists={playlists}
+          handlePlaylist={handlePlaylist}
+          setPlaylist={setPlaylist}
+          setPlaylists={setPlaylists}
+        />
         <Box
           component="main"
           sx={{

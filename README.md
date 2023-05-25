@@ -1,6 +1,6 @@
 # yucil
 
-> ** Youtube extended playlist for comfortable listening to music**
+> **Youtube extended playlist for comfortable listening to music**
 
 ***Not completed.***
 
