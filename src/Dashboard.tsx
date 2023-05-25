@@ -8,7 +8,8 @@ import Bar from './Bar';
 import List from './List';
 import Trash from './Trash';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
-import { getPlaylists, updatePlaylistItems } from './api';
+import { deletePlaylistItem, getPlaylists, updatePlaylistItems } from './api';
+import { insertPlaylistItem } from './api';
 // import { invoke } from '@tauri-apps/api';
 
 export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
@@ -96,7 +97,6 @@ export default function Dashboard() {
     return result;
   };
 
-  //! FIXME: 異なるプレイリストに移動できない
   // TODO: 選択している動画が変わらないようにする
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -123,13 +123,24 @@ export default function Dashboard() {
       return;
     }
 
-    setPlaylists((prev) => {
-      const isSuccess = updatePlaylistItems(prev, source, destination);
-      if (isSuccess) {
-        return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
-      }
-      return prev;
-    });
+    if (isSamePlaylist) {
+      setPlaylists((prev) => {
+        const isSuccess = updatePlaylistItems(prev, source, destination);
+        if (isSuccess) {
+          return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
+        }
+        return prev;
+      });
+    } else {
+      setPlaylists((prev) => {
+        const isDeleteSuccess = deletePlaylistItem(prev, source);
+        const isInsertSuccess = isDeleteSuccess && insertPlaylistItem(prev, source, destination);
+        if (isDeleteSuccess && isInsertSuccess) {
+          return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
+        }
+        return prev;
+      });
+    }
   };
 
   return (

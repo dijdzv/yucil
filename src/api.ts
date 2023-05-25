@@ -106,6 +106,41 @@ export function getPlaylists(
 //   }
 // }
 
+export const insertPlaylistItem = (
+  playlists: Playlist[],
+  source: DraggableLocation,
+  destination: DraggableLocation
+): boolean => {
+  const destinationPlaylist = playlists.find((playlist) => playlist.id === destination.droppableId);
+  const sourcePlaylist = playlists.find((playlist) => playlist.id === source.droppableId);
+  if (!sourcePlaylist || !destinationPlaylist) return false;
+  const sourcePlaylistItem = sourcePlaylist.items[source.index];
+  const destinationPlaylistItem = destinationPlaylist.items[destination.index];
+
+  gapi.client.youtube.playlistItems
+    .insert({
+      part: 'snippet',
+      resource: {
+        snippet: {
+          playlistId: destinationPlaylistItem.playlistId,
+          resourceId: {
+            kind: destinationPlaylistItem.resourceId.kind,
+            videoId: sourcePlaylistItem.resourceId.videoId,
+          },
+          position: destinationPlaylistItem.position,
+        },
+      },
+    })
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((err) => {
+      console.log(err);
+      return false;
+    });
+  return true;
+};
+
 export function updatePlaylistItems(
   playlists: Playlist[],
   source: DraggableLocation,
@@ -142,3 +177,22 @@ export function updatePlaylistItems(
     });
   return true;
 }
+
+export const deletePlaylistItem = (playlists: Playlist[], source: DraggableLocation): boolean => {
+  const sourcePlaylist = playlists.find((playlist) => playlist.id === source.droppableId);
+  if (!sourcePlaylist) return false;
+  const sourcePlaylistItem = sourcePlaylist.items[source.index];
+
+  gapi.client.youtube.playlistItems
+    .delete({
+      id: sourcePlaylistItem.id,
+    })
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((err) => {
+      console.log(err);
+      return false;
+    });
+  return true;
+};
