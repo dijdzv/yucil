@@ -86,18 +86,17 @@ export default function Dashboard() {
 
   const reorder = (prev: Playlist[], startIndex: number, startId: string, endIndex: number, endId: string) => {
     const result = prev;
-    const startPlaylist = result.find((p) => p.id === startId);
+    const startPlaylist = result.find((playlist) => playlist.id === startId);
     if (startPlaylist === undefined) {
       console.log('filed reorder', result);
       return result;
     }
     const [removed] = startPlaylist.items.splice(startIndex, 1);
-    result.find((p) => p.id === endId)?.items.splice(endIndex, 0, removed);
+    result.find((playlist) => playlist.id === endId)?.items.splice(endIndex, 0, removed);
     console.log('reorder', result);
     return result;
   };
 
-  // TODO: 選択している動画が変わらないようにする
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
 
@@ -114,13 +113,27 @@ export default function Dashboard() {
 
     if (destination.droppableId === 'trash') {
       setPlaylists((prev) => {
-        const isSuccess = updatePlaylistItems(prev, source, destination);
-        if (isSuccess) {
-          prev.find((p) => p.id === source.droppableId)?.items.splice(source.index, 1);
+        const isDeleteSuccess = deletePlaylistItem(prev, source);
+        if (isDeleteSuccess) {
+          prev.find((playlist) => playlist.id === source.droppableId)?.items.splice(source.index, 1);
         }
         return prev;
       });
       return;
+    }
+
+    // TODO: この時、現在の再生時間の１秒前に戻す
+    const isNowPlaying = playlist?.id === source.droppableId && playlist?.index === source.index;
+    if (isNowPlaying) {
+      setPlaylist((prev) => {
+        if (isSamePlaylist) {
+          return { ...prev, index: destination.index } as Playlist;
+        } else {
+          const destinationPlaylist = playlists.find((playlist) => playlist.id === destination.droppableId);
+          if (!destinationPlaylist) return prev;
+          return { ...destinationPlaylist, index: destination.index } as Playlist;
+        }
+      });
     }
 
     if (isSamePlaylist) {
