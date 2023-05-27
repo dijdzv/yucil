@@ -80,8 +80,12 @@ export default function Dashboard() {
     setPlaylist(undefined);
     setTimeout(() => {
       setPlaylist(newPlaylist);
-      ref.current.handlePlaying(true);
+      handlePlaying(true);
     }, 200);
+  };
+
+  const handlePlaying = (playing: boolean) => {
+    ref.current.handlePlaying(playing);
   };
 
   const reorder = (prev: Playlist[], startIndex: number, startId: string, endIndex: number, endId: string) => {
@@ -165,6 +169,7 @@ export default function Dashboard() {
           handlePlaylist={handlePlaylist}
           setPlaylist={setPlaylist}
           setPlaylists={setPlaylists}
+          handlePlaying={handlePlaying}
         />
         <Box
           component="main"

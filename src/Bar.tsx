@@ -79,14 +79,19 @@ type BarProps = {
   handlePlaylist: (playlist: Playlist, fn?: () => void) => void;
   setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>;
   setPlaylists: Dispatch<SetStateAction<Playlist[]>>;
+  handlePlaying: (playing: boolean) => void;
 };
 
 export default function Bar(props: BarProps) {
   // TODO: change playlist
-  const { playlists, handlePlaylist, setPlaylist, setPlaylists } = props;
+  const { playlists, handlePlaylist, setPlaylist, setPlaylists, handlePlaying } = props;
 
   const reloadPlaylists = () => {
-    getPlaylists(setPlaylist, setPlaylists);
+    handlePlaying(false);
+    setPlaylist(undefined);
+    setTimeout(() => {
+      getPlaylists(setPlaylist, setPlaylists);
+    }, 200);
   };
 
   const [open, setOpen] = useState(false);
