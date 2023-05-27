@@ -137,7 +137,7 @@ export default function Dashboard() {
       return;
     }
 
-    // TODO: この時、現在の再生時間に戻す
+    // TODO: 異なるプレイリストに移す時、現在の再生時間に戻す
     const isNowPlaying = playlist?.id === source.droppableId && playlist?.index === source.index;
     if (isNowPlaying) {
       setPlaylist((prev) => {

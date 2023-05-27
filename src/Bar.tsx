@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useState, useContext } from 'react';
 import { styled } from '@mui/material/styles';
-import { Box, List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link } from '@mui/material';
+import { Box, List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -103,11 +103,16 @@ export default function Bar(props: BarProps) {
 
   const [trashOpen, setTrashOpen] = useState(false);
   const { trash, setTrash } = useContext(TrashContext);
-  const handleOnClick = () => {
+  const handleTrashClick = () => {
     setTrashOpen((prev) => !prev);
   };
 
+  const handlePlaylistTitleClick = (playlist: Playlist) => {
+    // TODO: playlistTitleをクリックしたら、playlistの表示を切り替える
+  };
+
   // TODO: Trashをクリックしたら、Trashに入れた曲を表示する
+  // TODO: Trashに入れた曲をplaylistsに戻せるようにする
 
   return (
     <>
@@ -127,7 +132,7 @@ export default function Bar(props: BarProps) {
           <IconButton onClick={reloadPlaylists}>
             <AutorenewIcon />
           </IconButton>
-          <IconButton onClick={handleOnClick}>
+          <IconButton onClick={handleTrashClick}>
             <Droppable droppableId="trash">
               {(provided) => (
                 <div ref={provided.innerRef} style={{ height: '24px' }}>
@@ -137,6 +142,13 @@ export default function Bar(props: BarProps) {
             </Droppable>
           </IconButton>
           <Divider sx={{ my: 1 }} />
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            {playlists.map((playlist) => (
+              <Button onClick={() => handlePlaylistTitleClick(playlist)}>
+                <Box>{playlist.title}</Box>
+              </Button>
+            ))}
+          </Box>
         </List>
       </Drawer>
       <Box
