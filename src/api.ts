@@ -59,6 +59,7 @@ export function getPlaylists(
                 return {
                   id: playlist.id || 'undefined',
                   title: playlist.snippet?.title || 'undefined',
+                  thumbnail: playlist.snippet?.thumbnails?.default?.url || '',
                   items: newPlaylistItems,
                   index: 0,
                 };
@@ -68,6 +69,7 @@ export function getPlaylists(
                 return {
                   id: 'undefined',
                   title: 'undefined',
+                  thumbnail: '',
                   items: [],
                   index: 0,
                 };

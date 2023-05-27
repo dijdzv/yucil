@@ -1,6 +1,17 @@
 import { Dispatch, SetStateAction, useState, useContext } from 'react';
 import { styled } from '@mui/material/styles';
-import { Box, List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link, Button } from '@mui/material';
+import {
+  Box,
+  List,
+  Divider,
+  Toolbar,
+  Typography,
+  Drawer as MuiDrawer,
+  IconButton,
+  Link,
+  Button,
+  CardMedia,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -125,7 +136,7 @@ export default function Bar(props: BarProps) {
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open} sx={{ zIndex: 1201 }}>
-        <List component="nav" sx={{ mx: 1 }}>
+        <List component="nav" sx={{ mx: 1, pb: 0 }}>
           <IconButton color="inherit" onClick={toggleDrawer}>
             <MenuIcon />
           </IconButton>
@@ -141,14 +152,19 @@ export default function Bar(props: BarProps) {
               )}
             </Droppable>
           </IconButton>
-          <Divider sx={{ my: 1 }} />
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            {playlists.map((playlist) => (
-              <Button color={'inherit'} onClick={() => handlePlaylistTitleClick(playlist)}>
-                <Box>{playlist.title}</Box>
-              </Button>
-            ))}
-          </Box>
+        </List>
+        <Divider sx={{ my: 1 }} />
+        <List component="nav" sx={{ display: 'flex', flexDirection: 'column', mx: 0.5, pt: 0 }}>
+          {playlists.map((playlist) => (
+            <Button
+              color="inherit"
+              onClick={() => handlePlaylistTitleClick(playlist)}
+              startIcon={<CardMedia image={playlist?.thumbnail} sx={{ width: '40px', height: '24.5px' }} />}
+              sx={{ justifyContent: 'left' }}
+            >
+              <Box>{playlist.title}</Box>
+            </Button>
+          ))}
         </List>
       </Drawer>
       <Box

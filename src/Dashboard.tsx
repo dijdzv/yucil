@@ -23,6 +23,7 @@ export const TrashContext = React.createContext({} as TrashContextProps);
 export type Playlist = {
   id: string;
   title: string;
+  thumbnail: string;
   items: PlaylistItem[];
   index: number;
 };
