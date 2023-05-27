@@ -162,39 +162,39 @@ export default function Dashboard() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <Bar
-          playlists={playlists}
-          handlePlaylist={handlePlaylist}
-          setPlaylist={setPlaylist}
-          setPlaylists={setPlaylists}
-          handlePlaying={handlePlaying}
-        />
-        <Box
-          component="main"
-          sx={{
-            // backgroundColor: (theme) =>
-            //   theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'hidden',
-          }}
-        >
-          {/* // TODO: Grid layout  */}
-          <Container
-            maxWidth="lg"
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
+          <Bar
+            playlists={playlists}
+            handlePlaylist={handlePlaylist}
+            setPlaylist={setPlaylist}
+            setPlaylists={setPlaylists}
+            handlePlaying={handlePlaying}
+          />
+          <Box
+            component="main"
             sx={{
-              p: 1,
-              mt: '4rem',
-              height: 'calc(100% - 4rem)',
-              position: 'relative',
-              display: 'flex',
-              flexWrap: 'wrap',
-              rowGap: '0',
+              // backgroundColor: (theme) =>
+              //   theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
+              flexGrow: 1,
+              height: '100vh',
+              overflow: 'hidden',
             }}
           >
-            <DragDropContext onDragEnd={onDragEnd}>
+            {/* // TODO: Grid layout  */}
+            <Container
+              maxWidth="lg"
+              sx={{
+                p: 1,
+                mt: '4rem',
+                height: 'calc(100% - 4rem)',
+                position: 'relative',
+                display: 'flex',
+                flexWrap: 'wrap',
+                rowGap: '0',
+              }}
+            >
               <MusicPlayer playlist={playlist} setPlaylist={setPlaylist} ref={ref} />
               {playlists.map((playlistsItem: Playlist, index: number) => (
                 <List
@@ -207,10 +207,10 @@ export default function Dashboard() {
                 />
               ))}
               {/* <Trash /> */}
-            </DragDropContext>
-          </Container>
+            </Container>
+          </Box>
         </Box>
-      </Box>
+      </DragDropContext>
     </ThemeProvider>
   );
 }

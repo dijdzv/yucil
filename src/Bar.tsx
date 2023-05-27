@@ -7,6 +7,7 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { Playlist } from './Dashboard';
 import { getPlaylists } from './api';
+import Trash from './Trash';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -87,8 +88,8 @@ export default function Bar(props: BarProps) {
   const { playlists, handlePlaylist, setPlaylist, setPlaylists, handlePlaying } = props;
 
   const reloadPlaylists = () => {
-    handlePlaying(false);
     setPlaylist(undefined);
+    handlePlaying(false);
     setTimeout(() => {
       getPlaylists(setPlaylist, setPlaylists);
     }, 200);
@@ -116,6 +117,9 @@ export default function Bar(props: BarProps) {
           </IconButton>
           <IconButton onClick={reloadPlaylists}>
             <AutorenewIcon />
+          </IconButton>
+          <IconButton>
+            <Trash />
           </IconButton>
           <Divider sx={{ my: 1 }} />
         </List>
