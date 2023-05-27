@@ -180,7 +180,6 @@ export default function Dashboard() {
           <TrashContext.Provider value={{ trash, setTrash }}>
             <Bar
               playlists={playlists}
-              handlePlaylist={handlePlaylist}
               setPlaylist={setPlaylist}
               setPlaylists={setPlaylists}
               handlePlaying={handlePlaying}

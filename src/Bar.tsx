@@ -89,7 +89,6 @@ function Copyright(props: any) {
 
 type BarProps = {
   playlists: Playlist[];
-  handlePlaylist: (playlist: Playlist, fn?: () => void) => void;
   setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>;
   setPlaylists: Dispatch<SetStateAction<Playlist[]>>;
   handlePlaying: (playing: boolean) => void;
@@ -97,7 +96,7 @@ type BarProps = {
 
 export default function Bar(props: BarProps) {
   // TODO: change playlist
-  const { playlists, handlePlaylist, setPlaylist, setPlaylists, handlePlaying } = props;
+  const { playlists, setPlaylist, setPlaylists, handlePlaying } = props;
 
   const reloadPlaylists = () => {
     setPlaylist(undefined);
@@ -153,7 +152,7 @@ export default function Bar(props: BarProps) {
             </Droppable>
           </IconButton>
         </List>
-        <Divider sx={{ my: 1 }} />
+        <Divider sx={{ m: 1 }} />
         <List component="nav" sx={{ display: 'flex', flexDirection: 'column', mx: 0.5, pt: 0 }}>
           {playlists.map((playlist) => (
             <Button
