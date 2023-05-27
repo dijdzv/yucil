@@ -81,7 +81,7 @@ export default function List(props: ListProps) {
               sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
               className={playlist?.id === playlistsItem.id ? 'yucil-1' : ''}
             >
-              <Button color="inherit" fullWidth={true}>
+              <Button color="inherit" fullWidth={true} sx={{ justifyContent: 'left' }}>
                 {playlistsItem.title}
               </Button>
             </ListSubheader>
