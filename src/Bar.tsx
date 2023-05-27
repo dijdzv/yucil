@@ -144,7 +144,7 @@ export default function Bar(props: BarProps) {
           <Divider sx={{ my: 1 }} />
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             {playlists.map((playlist) => (
-              <Button onClick={() => handlePlaylistTitleClick(playlist)}>
+              <Button color={'inherit'} onClick={() => handlePlaylistTitleClick(playlist)}>
                 <Box>{playlist.title}</Box>
               </Button>
             ))}

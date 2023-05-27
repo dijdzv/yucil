@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, List as MuiList, Card, CardContent, ListSubheader } from '@mui/material';
+import { Box, List as MuiList, Card, CardContent, ListSubheader, Button } from '@mui/material';
 import {
   Droppable,
   Draggable,
@@ -81,7 +81,9 @@ export default function List(props: ListProps) {
               sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
               className={playlist?.id === playlistsItem.id ? 'yucil-1' : ''}
             >
-              {playlistsItem.title}
+              <Button color="inherit" fullWidth={true}>
+                {playlistsItem.title}
+              </Button>
             </ListSubheader>
           }
           sx={{ height: '100%', pb: 0 }}
