@@ -1,13 +1,14 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useState, useContext } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, List, Divider, Toolbar, Typography, Drawer as MuiDrawer, IconButton, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
+import DeleteIcon from '@mui/icons-material/Delete';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
-import { Playlist } from './Dashboard';
+import { Droppable } from 'react-beautiful-dnd';
+import { Playlist, TrashContext } from './Dashboard';
 import { getPlaylists } from './api';
-import Trash from './Trash';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -100,6 +101,14 @@ export default function Bar(props: BarProps) {
     setOpen(!open);
   };
 
+  const [trashOpen, setTrashOpen] = useState(false);
+  const { trash, setTrash } = useContext(TrashContext);
+  const handleOnClick = () => {
+    setTrashOpen((prev) => !prev);
+  };
+
+  // TODO: Trashをクリックしたら、Trashに入れた曲を表示する
+
   return (
     <>
       <AppBar position="absolute" open={open} sx={{ backgroundColor: '#000' }}>
@@ -118,12 +127,30 @@ export default function Bar(props: BarProps) {
           <IconButton onClick={reloadPlaylists}>
             <AutorenewIcon />
           </IconButton>
-          <IconButton>
-            <Trash />
+          <IconButton onClick={handleOnClick}>
+            <Droppable droppableId="trash">
+              {(provided) => (
+                <div ref={provided.innerRef} style={{ height: '24px' }}>
+                  <DeleteIcon />
+                </div>
+              )}
+            </Droppable>
           </IconButton>
           <Divider sx={{ my: 1 }} />
         </List>
       </Drawer>
+      <Box
+        sx={{
+          bgcolor: 'red',
+          width: 300,
+          height: 300,
+          position: 'absolute',
+          top: 50,
+          left: 70,
+          zIndex: 5000,
+          display: trashOpen ? 'block' : 'none',
+        }}
+      ></Box>
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline, Container } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -6,13 +6,19 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
-import Trash from './Trash';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
 import { deletePlaylistItem, getPlaylists, updatePlaylistItems } from './api';
 import { insertPlaylistItem } from './api';
 // import { invoke } from '@tauri-apps/api';
 
 export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
+
+type TrashContextProps = {
+  trash: PlaylistItem[];
+  setTrash: React.Dispatch<React.SetStateAction<PlaylistItem[]>>;
+};
+
+export const TrashContext = React.createContext({} as TrashContextProps);
 
 export type Playlist = {
   id: string;
@@ -48,6 +54,7 @@ export default function Dashboard() {
   );
   const [playlist, setPlaylist] = useState<Playlist>();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [trash, setTrash] = useState<PlaylistItem[]>([]);
 
   const ref = useRef({} as MusicPlayerRefHandle);
 
@@ -119,14 +126,18 @@ export default function Dashboard() {
       setPlaylists((prev) => {
         const isDeleteSuccess = deletePlaylistItem(prev, source);
         if (isDeleteSuccess) {
-          prev.find((playlist) => playlist.id === source.droppableId)?.items.splice(source.index, 1);
+          const deleted = prev.find((playlist) => playlist.id === source.droppableId)?.items.splice(source.index, 1)[0];
+          deleted &&
+            setTrash((prev) => {
+              return [...prev, deleted];
+            });
         }
         return prev;
       });
       return;
     }
 
-    // TODO: この時、現在の再生時間の１秒前に戻す
+    // TODO: この時、現在の再生時間に戻す
     const isNowPlaying = playlist?.id === source.droppableId && playlist?.index === source.index;
     if (isNowPlaying) {
       setPlaylist((prev) => {
@@ -165,13 +176,15 @@ export default function Dashboard() {
       <DragDropContext onDragEnd={onDragEnd}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
-          <Bar
-            playlists={playlists}
-            handlePlaylist={handlePlaylist}
-            setPlaylist={setPlaylist}
-            setPlaylists={setPlaylists}
-            handlePlaying={handlePlaying}
-          />
+          <TrashContext.Provider value={{ trash, setTrash }}>
+            <Bar
+              playlists={playlists}
+              handlePlaylist={handlePlaylist}
+              setPlaylist={setPlaylist}
+              setPlaylists={setPlaylists}
+              handlePlaying={handlePlaying}
+            />
+          </TrashContext.Provider>
           <Box
             component="main"
             sx={{
