@@ -18,7 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { Droppable } from 'react-beautiful-dnd';
-import { Playlist, TrashContext } from './Dashboard';
+import { Playlist, Playlists, TrashContext } from './Dashboard';
 import { getPlaylists } from './api';
 
 interface AppBarProps extends MuiAppBarProps {
@@ -88,21 +88,23 @@ function Copyright(props: any) {
 }
 
 type BarProps = {
-  playlists: Playlist[];
-  setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>;
-  setPlaylists: Dispatch<SetStateAction<Playlist[]>>;
+  playlists: Playlists;
+  setPlaylists: Dispatch<SetStateAction<Playlists>>;
   handlePlaying: (playing: boolean) => void;
 };
 
 export default function Bar(props: BarProps) {
   // TODO: change playlist
-  const { playlists, setPlaylist, setPlaylists, handlePlaying } = props;
+  const { playlists, setPlaylists, handlePlaying } = props;
 
   const reloadPlaylists = () => {
-    setPlaylist(undefined);
+    setPlaylists((prev) => {
+      prev.deselectPlaylist();
+      return prev;
+    });
     handlePlaying(false);
     setTimeout(() => {
-      getPlaylists(setPlaylist, setPlaylists);
+      getPlaylists(setPlaylists);
     }, 200);
   };
 
@@ -154,7 +156,7 @@ export default function Bar(props: BarProps) {
         </List>
         <Divider sx={{ m: 1 }} />
         <List component="nav" sx={{ display: 'flex', flexDirection: 'column', mx: 0.5, pt: 0 }}>
-          {playlists.map((playlist) => (
+          {playlists.items.map((playlist) => (
             <Button
               color="inherit"
               onClick={() => handlePlaylistTitleClick(playlist)}

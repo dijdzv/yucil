@@ -10,7 +10,7 @@ import {
 import { FixedSizeList, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Item from './Item';
-import { Playlist, PlaylistItem } from './Dashboard';
+import { Playlist, PlaylistItem, Playlists } from './Dashboard';
 
 const getRenderItem =
   (items: PlaylistItem[]) =>
@@ -33,7 +33,7 @@ const getRenderItem =
 
 type RowProps = {
   data: {
-    playlist: Playlist | undefined;
+    playlists: Playlists;
     playlistsItem: Playlist;
     handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
   };
@@ -41,14 +41,14 @@ type RowProps = {
   style: Object;
 };
 
-const Row = React.memo(({ data: { playlist, playlistsItem, handlePlaylistAt }, index, style }: RowProps) => {
+const Row = React.memo(({ data: { playlists, playlistsItem, handlePlaylistAt }, index, style }: RowProps) => {
   const playlistItem = playlistsItem.items[index];
   const renderItem = getRenderItem(playlistsItem.items);
 
   return (
     <Box
       sx={style}
-      className={playlist?.id === playlistsItem.id && playlist?.index === index ? 'yucil-2' : ''}
+      className={playlists.isPlayingPosition(playlistItem.id, index) ? 'yucil-2' : ''}
       key={index + playlistItem.id}
       onClick={() => handlePlaylistAt(playlistsItem, index)}
     >
@@ -60,15 +60,15 @@ const Row = React.memo(({ data: { playlist, playlistsItem, handlePlaylistAt }, i
 }, areEqual);
 
 type ListProps = {
-  playlist: Playlist | undefined;
+  playlists: Playlists;
   playlistsItem: Playlist;
   index: number;
-  handlePlaylist: (newPlaylist?: Playlist) => void;
+  handlePlaylist: (newPlaylist: Playlist) => void;
   handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
 };
 
 export default function List(props: ListProps) {
-  const { playlist, playlistsItem, index, handlePlaylist, handlePlaylistAt } = props;
+  const { playlists, playlistsItem, index, handlePlaylist, handlePlaylistAt } = props;
   const renderItem = getRenderItem(playlistsItem.items);
 
   return (
@@ -79,7 +79,7 @@ export default function List(props: ListProps) {
             <ListSubheader
               onClick={() => handlePlaylist(playlistsItem)}
               sx={{ borderBottom: 'solid 1px rgba(255, 255, 255, 0.12)' }}
-              className={playlist?.id === playlistsItem.id ? 'yucil-1' : ''}
+              className={playlists.isPlayingPlaylist(playlistsItem.id) ? 'yucil-1' : ''}
             >
               <Button color="inherit" fullWidth={true} sx={{ justifyContent: 'left' }}>
                 {playlistsItem.title}
@@ -99,7 +99,7 @@ export default function List(props: ListProps) {
                       itemSize={48.48}
                       width={width ?? 0}
                       outerRef={provided.innerRef}
-                      itemData={{ playlist, playlistsItem, handlePlaylistAt }}
+                      itemData={{ playlists, playlistsItem, handlePlaylistAt }}
                     >
                       {Row}
                     </FixedSizeList>

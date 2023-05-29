@@ -20,6 +20,56 @@ type TrashContextProps = {
 
 export const TrashContext = React.createContext({} as TrashContextProps);
 
+export class Playlists {
+  public items: Playlist[];
+  public playlistId: string | undefined;
+
+  constructor(playlists: Playlist[], playlistId?: string) {
+    this.items = playlists;
+    this.playlistId = playlistId;
+  }
+
+  /**
+   * You need to check with isExistPlaylist before using this.
+   * Always succeeds if droppableId is used for playlistId
+   */
+  public getPlaylist(playlistId?: string): Playlist {
+    return this.items.find((playlist) => playlist.id === playlistId) as Playlist;
+  }
+
+  public getPlayingPlaylist(): Playlist {
+    return this.getPlaylist(this.playlistId);
+  }
+
+  public setPlaylistId(playlistId: string) {
+    this.playlistId = playlistId;
+  }
+
+  public setPlaylistIndex(playlistId: string, index: number) {
+    this.getPlaylist(playlistId).index = index;
+  }
+
+  public setPlayingPlaylistIndex(index: number) {
+    this.getPlayingPlaylist().index = index;
+  }
+
+  public isPlayingPlaylist(playlistId: string): boolean {
+    return this.playlistId === playlistId;
+  }
+
+  public isPlayingPosition(playlistId: string, index: number): boolean {
+    return this.isPlayingPlaylist(playlistId) && this.getPlayingPlaylist().index === index;
+  }
+
+  public isExistPlaylist(playlistId: string): boolean {
+    return this.items.some((playlist) => playlist.id === playlistId);
+  }
+
+  public deselectPlaylist() {
+    this.playlistId = undefined;
+  }
+}
+
 export type Playlist = {
   id: string;
   title: string;
@@ -53,25 +103,25 @@ export default function Dashboard() {
       }),
     [prefersDarkMode]
   );
-  const [playlist, setPlaylist] = useState<Playlist>();
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [playlists, setPlaylists] = useState<Playlists>({} as Playlists);
   const [trash, setTrash] = useState<PlaylistItem[]>([]);
 
   const ref = useRef({} as MusicPlayerRefHandle);
 
   useEffect(() => {
-    getPlaylists(setPlaylist, setPlaylists);
+    getPlaylists(setPlaylists);
   }, []);
 
-  console.log('playlist change: ', playlist);
+  console.log('playlist change: ', playlists.getPlayingPlaylist());
 
   // TODO: setTimeoutやsetIntervalを使わない方法を考える
   // TODO: handleOnReadyを使う
   const handlePlaylistAt = (newPlaylist: Playlist, index: number) => {
-    if (playlist?.id === newPlaylist.id) {
-      if (playlist.index !== index) {
-        setPlaylist((prev) => {
-          return { ...prev, index } as Playlist;
+    if (playlists.isPlayingPlaylist(newPlaylist.id)) {
+      if (!playlists.isPlayingPosition(newPlaylist.id, index)) {
+        setPlaylists((prev) => {
+          prev.setPlayingPlaylistIndex(index);
+          return prev;
         });
         ref.current.handlePlaylistAt(index);
       }
@@ -83,11 +133,17 @@ export default function Dashboard() {
     }
   };
 
-  const handlePlaylist = (newPlaylist?: Playlist) => {
-    if (playlist?.id === newPlaylist?.id) return;
-    setPlaylist(undefined);
+  const handlePlaylist = (newPlaylist: Playlist) => {
+    if (playlists.isPlayingPlaylist(newPlaylist.id)) return;
+    setPlaylists((prev) => {
+      prev.deselectPlaylist();
+      return prev;
+    });
     setTimeout(() => {
-      setPlaylist(newPlaylist);
+      setPlaylists((prev) => {
+        prev.setPlaylistId(newPlaylist.id);
+        return prev;
+      });
       handlePlaying(true);
     }, 200);
   };
@@ -96,15 +152,12 @@ export default function Dashboard() {
     ref.current.handlePlaying(playing);
   };
 
-  const reorder = (prev: Playlist[], startIndex: number, startId: string, endIndex: number, endId: string) => {
+  const reorder = (prev: Playlists, startIndex: number, startId: string, endIndex: number, endId: string) => {
     const result = prev;
-    const startPlaylist = result.find((playlist) => playlist.id === startId);
-    if (startPlaylist === undefined) {
-      console.log('filed reorder', result);
-      return result;
-    }
+    const startPlaylist = result.getPlaylist(startId);
+
     const [removed] = startPlaylist.items.splice(startIndex, 1);
-    result.find((playlist) => playlist.id === endId)?.items.splice(endIndex, 0, removed);
+    result.getPlaylist(endId).items.splice(endIndex, 0, removed);
     console.log('reorder', result);
     return result;
   };
@@ -127,7 +180,7 @@ export default function Dashboard() {
       setPlaylists((prev) => {
         const isDeleteSuccess = deletePlaylistItem(prev, source);
         if (isDeleteSuccess) {
-          const deleted = prev.find((playlist) => playlist.id === source.droppableId)?.items.splice(source.index, 1)[0];
+          const deleted = prev.getPlaylist(source.droppableId).items.splice(source.index, 1)[0];
           deleted &&
             setTrash((prev) => {
               return [...prev, deleted];
@@ -139,15 +192,16 @@ export default function Dashboard() {
     }
 
     // TODO: 異なるプレイリストに移す時、現在の再生時間に戻す
-    const isNowPlaying = playlist?.id === source.droppableId && playlist?.index === source.index;
+    const isNowPlaying = playlists.isPlayingPosition(source.droppableId, source.index);
     if (isNowPlaying) {
-      setPlaylist((prev) => {
+      setPlaylists((prev) => {
         if (isSamePlaylist) {
-          return { ...prev, index: destination.index } as Playlist;
+          prev.setPlayingPlaylistIndex(destination.index);
+          return prev;
         } else {
-          const destinationPlaylist = playlists.find((playlist) => playlist.id === destination.droppableId);
-          if (!destinationPlaylist) return prev;
-          return { ...destinationPlaylist, index: destination.index } as Playlist;
+          prev.setPlaylistId(destination.droppableId);
+          prev.setPlaylistIndex(destination.droppableId, destination.index);
+          return prev;
         }
       });
     }
@@ -178,12 +232,7 @@ export default function Dashboard() {
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
           <TrashContext.Provider value={{ trash, setTrash }}>
-            <Bar
-              playlists={playlists}
-              setPlaylist={setPlaylist}
-              setPlaylists={setPlaylists}
-              handlePlaying={handlePlaying}
-            />
+            <Bar playlists={playlists} setPlaylists={setPlaylists} handlePlaying={handlePlaying} />
           </TrashContext.Provider>
           <Box
             component="main"
@@ -208,10 +257,10 @@ export default function Dashboard() {
                 rowGap: '0',
               }}
             >
-              <MusicPlayer playlist={playlist} setPlaylist={setPlaylist} ref={ref} />
-              {playlists.map((playlistsItem: Playlist, index: number) => (
+              <MusicPlayer playlists={playlists} setPlaylists={setPlaylists} ref={ref} />
+              {playlists.items.map((playlistsItem: Playlist, index: number) => (
                 <List
-                  playlist={playlist}
+                  playlists={playlists}
                   playlistsItem={playlistsItem}
                   index={index}
                   key={playlistsItem.id}
@@ -219,7 +268,6 @@ export default function Dashboard() {
                   handlePlaylistAt={handlePlaylistAt}
                 />
               ))}
-              {/* <Trash /> */}
             </Container>
           </Box>
         </Box>

@@ -1,13 +1,10 @@
 declare let tokenClient: any;
 declare const google: any;
 import { Dispatch, SetStateAction } from 'react';
-import { Playlist, PlaylistItem } from './Dashboard';
+import { Playlist, PlaylistItem, Playlists } from './Dashboard';
 import { DraggableLocation } from 'react-beautiful-dnd';
 
-export function getPlaylists(
-  setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>,
-  setPlaylists: Dispatch<SetStateAction<Playlist[]>>
-) {
+export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) {
   tokenClient.callback = (resp: any) => {
     if (resp.error !== undefined) {
       throw resp;
@@ -76,8 +73,7 @@ export function getPlaylists(
               });
           }) || [];
         Promise.all(playlistsPromise).then((newPlaylists) => {
-          setPlaylist({ ...newPlaylists[0] });
-          setPlaylists(newPlaylists);
+          setPlaylists(new Playlists(newPlaylists, playlists?.at(0)?.id));
         });
       })
       .catch((err) => console.log(err));
@@ -109,13 +105,12 @@ export function getPlaylists(
 // }
 
 export const insertPlaylistItem = (
-  playlists: Playlist[],
+  playlists: Playlists,
   source: DraggableLocation,
   destination: DraggableLocation
 ): boolean => {
-  const destinationPlaylist = playlists.find((playlist) => playlist.id === destination.droppableId);
-  const sourcePlaylist = playlists.find((playlist) => playlist.id === source.droppableId);
-  if (!sourcePlaylist || !destinationPlaylist) return false;
+  const sourcePlaylist = playlists.getPlaylist(source.droppableId);
+  const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
 
@@ -144,13 +139,12 @@ export const insertPlaylistItem = (
 };
 
 export function updatePlaylistItems(
-  playlists: Playlist[],
+  playlists: Playlists,
   source: DraggableLocation,
   destination: DraggableLocation
 ): boolean {
-  const sourcePlaylist = playlists.find((playlist) => playlist.id === source.droppableId);
-  const destinationPlaylist = playlists.find((playlist) => playlist.id === destination.droppableId);
-  if (!sourcePlaylist || !destinationPlaylist) return false;
+  const sourcePlaylist = playlists.getPlaylist(source.droppableId);
+  const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
   gapi.client.youtube.playlistItems
@@ -180,9 +174,8 @@ export function updatePlaylistItems(
   return true;
 }
 
-export const deletePlaylistItem = (playlists: Playlist[], source: DraggableLocation): boolean => {
-  const sourcePlaylist = playlists.find((playlist) => playlist.id === source.droppableId);
-  if (!sourcePlaylist) return false;
+export const deletePlaylistItem = (playlists: Playlists, source: DraggableLocation): boolean => {
+  const sourcePlaylist = playlists.getPlaylist(source.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
 
   gapi.client.youtube.playlistItems

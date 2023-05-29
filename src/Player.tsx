@@ -20,11 +20,11 @@ import Replay10Icon from '@mui/icons-material/Replay10';
 import Replay30Icon from '@mui/icons-material/Replay30';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { OnProgressProps } from 'react-player/base';
-import { BASE_PLAYLIST_URL, Playlist } from './Dashboard';
+import { BASE_PLAYLIST_URL, Playlist, Playlists } from './Dashboard';
 
 type MusicPlayerProps = {
-  playlist: Playlist | undefined;
-  setPlaylist: Dispatch<SetStateAction<Playlist | undefined>>;
+  playlists: Playlists;
+  setPlaylists: Dispatch<SetStateAction<Playlists>>;
 };
 
 export interface MusicPlayerRefHandle {
@@ -34,7 +34,7 @@ export interface MusicPlayerRefHandle {
 }
 
 export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(function MusicPlayer(props, ref) {
-  const { playlist, setPlaylist } = props;
+  const { playlists, setPlaylists } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
@@ -200,7 +200,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
       <ReactPlayer
         id="music-player"
         ref={playerRef}
-        url={playlist === undefined ? undefined : BASE_PLAYLIST_URL + playlist.id}
+        url={playlist === '' ? undefined : BASE_PLAYLIST_URL + playlist.id}
         playing={playing}
         playsinline={true}
         loop={loop}
