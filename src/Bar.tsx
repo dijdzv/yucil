@@ -100,7 +100,7 @@ export default function Bar(props: BarProps) {
   const reloadPlaylists = () => {
     setPlaylists((prev) => {
       prev.deselectPlaylist();
-      return prev;
+      return prev.copy();
     });
     handlePlaying(false);
     setTimeout(() => {
@@ -159,6 +159,7 @@ export default function Bar(props: BarProps) {
           {playlists.items.map((playlist) => (
             <Button
               color="inherit"
+              key={playlist.id}
               onClick={() => handlePlaylistTitleClick(playlist)}
               startIcon={<CardMedia image={playlist?.thumbnail} sx={{ width: '40px', height: '24.5px' }} />}
               sx={{ justifyContent: 'left' }}

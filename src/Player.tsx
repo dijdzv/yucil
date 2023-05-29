@@ -168,7 +168,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
     playerRef.current?.getInternalPlayer().playVideoAt(previous);
     setPlaylists((prev) => {
       prev.setPlayingPlaylistIndex(previous);
-      return prev;
+      return prev.copy();
     });
     handlePlaying(true);
   };
@@ -180,7 +180,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
     playerRef.current?.getInternalPlayer().playVideoAt(next);
     setPlaylists((prev) => {
       prev.setPlayingPlaylistIndex(next);
-      return prev;
+      return prev.copy();
     });
     handlePlaying(true);
   };

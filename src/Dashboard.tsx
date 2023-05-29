@@ -68,6 +68,10 @@ export class Playlists {
   public deselectPlaylist() {
     this.playlistId = undefined;
   }
+
+  public copy(): Playlists {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+  }
 }
 
 export type Playlist = {
@@ -121,7 +125,7 @@ export default function Dashboard() {
       if (!playlists.isPlayingPosition(newPlaylist.id, index)) {
         setPlaylists((prev) => {
           prev.setPlayingPlaylistIndex(index);
-          return prev;
+          return prev.copy();
         });
         ref.current.handlePlaylistAt(index);
       }
@@ -137,12 +141,12 @@ export default function Dashboard() {
     if (playlists.isPlayingPlaylist(newPlaylist.id)) return;
     setPlaylists((prev) => {
       prev.deselectPlaylist();
-      return prev;
+      return prev.copy();
     });
     setTimeout(() => {
       setPlaylists((prev) => {
         prev.setPlaylistId(newPlaylist.id);
-        return prev;
+        return prev.copy();
       });
       handlePlaying(true);
     }, 200);
@@ -186,22 +190,23 @@ export default function Dashboard() {
               return [...prev, deleted];
             });
         }
-        return prev;
+        return prev.copy();
       });
       return;
     }
 
+    // TODO: setPlaylistsが実行されるのを一度にする
     // TODO: 異なるプレイリストに移す時、現在の再生時間に戻す
     const isNowPlaying = playlists.isPlayingPosition(source.droppableId, source.index);
     if (isNowPlaying) {
       setPlaylists((prev) => {
         if (isSamePlaylist) {
           prev.setPlayingPlaylistIndex(destination.index);
-          return prev;
+          return prev.copy();
         } else {
           prev.setPlaylistId(destination.droppableId);
           prev.setPlaylistIndex(destination.droppableId, destination.index);
-          return prev;
+          return prev.copy();
         }
       });
     }
@@ -212,7 +217,7 @@ export default function Dashboard() {
         if (isSuccess) {
           return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
         }
-        return prev;
+        return prev.copy();
       });
     } else {
       setPlaylists((prev) => {
@@ -221,7 +226,7 @@ export default function Dashboard() {
         if (isDeleteSuccess && isInsertSuccess) {
           return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
         }
-        return prev;
+        return prev.copy();
       });
     }
   };
@@ -258,11 +263,10 @@ export default function Dashboard() {
               }}
             >
               <MusicPlayer playlists={playlists} setPlaylists={setPlaylists} ref={ref} />
-              {playlists.items.map((playlistsItem: Playlist, index: number) => (
+              {playlists.items.map((playlistsItem: Playlist) => (
                 <List
                   playlists={playlists}
                   playlistsItem={playlistsItem}
-                  index={index}
                   key={playlistsItem.id}
                   handlePlaylist={handlePlaylist}
                   handlePlaylistAt={handlePlaylistAt}

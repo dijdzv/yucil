@@ -62,14 +62,15 @@ const Row = React.memo(({ data: { playlists, playlistsItem, handlePlaylistAt }, 
 type ListProps = {
   playlists: Playlists;
   playlistsItem: Playlist;
-  index: number;
   handlePlaylist: (newPlaylist: Playlist) => void;
   handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
 };
 
 export default function List(props: ListProps) {
-  const { playlists, playlistsItem, index, handlePlaylist, handlePlaylistAt } = props;
+  const { playlists, playlistsItem, handlePlaylist, handlePlaylistAt } = props;
   const renderItem = getRenderItem(playlistsItem.items);
+
+  //! FIXME: タイトルの色が適切に変わらない
 
   return (
     <Card variant="outlined" sx={{ minHeight: '17rem', maxHeight: '100%', width: '25%' }}>
