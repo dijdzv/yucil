@@ -103,7 +103,7 @@ export default function Dashboard() {
       }),
     [prefersDarkMode]
   );
-  const [playlists, setPlaylists] = useState<Playlists>({} as Playlists);
+  const [playlists, setPlaylists] = useState<Playlists>(new Playlists([], undefined));
   const [trash, setTrash] = useState<PlaylistItem[]>([]);
 
   const ref = useRef({} as MusicPlayerRefHandle);

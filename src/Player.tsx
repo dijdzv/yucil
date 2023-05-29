@@ -35,6 +35,7 @@ export interface MusicPlayerRefHandle {
 
 export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(function MusicPlayer(props, ref) {
   const { playlists, setPlaylists } = props;
+  const playlist = playlists.getPlayingPlaylist();
 
   const playerRef = useRef<ReactPlayer>(null);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
@@ -162,11 +163,12 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
 
   const handlePrevious = () => {
     console.log('handlePrevious');
-    const now = playlist?.index;
-    const previous = now === undefined || now === 0 ? playlist?.items.length : now - 1;
+    const now = playlist.index;
+    const previous = now === undefined || now === 0 ? playlist.items.length : now - 1;
     playerRef.current?.getInternalPlayer().playVideoAt(previous);
-    setPlaylist((prev) => {
-      return { ...prev, index: previous } as Playlist;
+    setPlaylists((prev) => {
+      prev.setPlayingPlaylistIndex(previous);
+      return prev;
     });
     handlePlaying(true);
   };
@@ -176,8 +178,9 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
     const now = playlist?.index;
     const next = now === undefined || now === playlist?.items.length ? 0 : now + 1;
     playerRef.current?.getInternalPlayer().playVideoAt(next);
-    setPlaylist((prev) => {
-      return { ...prev, index: next } as Playlist;
+    setPlaylists((prev) => {
+      prev.setPlayingPlaylistIndex(next);
+      return prev;
     });
     handlePlaying(true);
   };
@@ -200,7 +203,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(fu
       <ReactPlayer
         id="music-player"
         ref={playerRef}
-        url={playlist === '' ? undefined : BASE_PLAYLIST_URL + playlist.id}
+        url={playlists.playlistId === undefined ? undefined : BASE_PLAYLIST_URL + playlist.id}
         playing={playing}
         playsinline={true}
         loop={loop}
