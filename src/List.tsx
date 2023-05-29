@@ -48,7 +48,7 @@ const Row = React.memo(({ data: { playlists, playlistsItem, handlePlaylistAt }, 
   return (
     <Box
       sx={style}
-      className={playlists.isPlayingPosition(playlistItem.id, index) ? 'yucil-2' : ''}
+      className={playlists.isPlayingPosition(playlistsItem.id, index) ? 'yucil-2' : ''}
       key={index + playlistItem.id}
       onClick={() => handlePlaylistAt(playlistsItem, index)}
     >
@@ -69,8 +69,6 @@ type ListProps = {
 export default function List(props: ListProps) {
   const { playlists, playlistsItem, handlePlaylist, handlePlaylistAt } = props;
   const renderItem = getRenderItem(playlistsItem.items);
-
-  //! FIXME: タイトルの色が適切に変わらない
 
   return (
     <Card variant="outlined" sx={{ minHeight: '17rem', maxHeight: '100%', width: '25%' }}>

@@ -7,8 +7,7 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
-import { deletePlaylistItem, getPlaylists, updatePlaylistItems } from './api';
-import { insertPlaylistItem } from './api';
+import { deletePlaylistItem, getPlaylists, updatePlaylistItems, insertPlaylistItem } from './api';
 // import { invoke } from '@tauri-apps/api';
 
 export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
