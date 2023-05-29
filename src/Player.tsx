@@ -1,7 +1,6 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState, Dispatch, SetStateAction } from 'react';
-import { Box, Card, CardHeader, CardContent, Divider, IconButton, TextField, Toolbar, Slider } from '@mui/material';
+import { forwardRef, useImperativeHandle, useRef, useState, useContext } from 'react';
+import { Box, Card, CardHeader, CardContent, Divider, IconButton, Slider } from '@mui/material';
 import ReactPlayer from 'react-player/youtube';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RepeatIcon from '@mui/icons-material/Repeat';
@@ -20,12 +19,7 @@ import Replay10Icon from '@mui/icons-material/Replay10';
 import Replay30Icon from '@mui/icons-material/Replay30';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { OnProgressProps } from 'react-player/base';
-import { BASE_PLAYLIST_URL, Playlist, Playlists } from './Dashboard';
-
-type MusicPlayerProps = {
-  playlists: Playlists;
-  setPlaylists: Dispatch<SetStateAction<Playlists>>;
-};
+import { BASE_PLAYLIST_URL, PlaylistsContext } from './Dashboard';
 
 export interface MusicPlayerRefHandle {
   handlePlaylistAt(index: number): void;
@@ -33,8 +27,8 @@ export interface MusicPlayerRefHandle {
   isExist(): boolean;
 }
 
-export const MusicPlayer = forwardRef<MusicPlayerRefHandle, MusicPlayerProps>(function MusicPlayer(props, ref) {
-  const { playlists, setPlaylists } = props;
+export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer(props, ref) {
+  const { playlists, setPlaylists } = useContext(PlaylistsContext);
   const playlist = playlists.getPlayingPlaylist();
 
   const playerRef = useRef<ReactPlayer>(null);

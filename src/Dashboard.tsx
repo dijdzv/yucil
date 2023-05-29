@@ -19,6 +19,13 @@ type TrashContextProps = {
 
 export const TrashContext = React.createContext({} as TrashContextProps);
 
+type PlaylistsContextProps = {
+  playlists: Playlists;
+  setPlaylists: React.Dispatch<React.SetStateAction<Playlists>>;
+};
+
+export const PlaylistsContext = React.createContext({} as PlaylistsContextProps);
+
 export class Playlists {
   public items: Playlist[];
   public playlistId: string | undefined;
@@ -129,6 +136,7 @@ export default function Dashboard() {
         ref.current.handlePlaylistAt(index);
       }
     } else {
+      //! FIXME: ここでindexに変更されていない
       handlePlaylist({ ...newPlaylist, index });
       setTimeout(() => {
         ref.current.handlePlaylistAt(index);
@@ -233,47 +241,48 @@ export default function Dashboard() {
   return (
     <ThemeProvider theme={theme}>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Box sx={{ display: 'flex' }}>
-          <CssBaseline />
-          <TrashContext.Provider value={{ trash, setTrash }}>
-            <Bar playlists={playlists} setPlaylists={setPlaylists} handlePlaying={handlePlaying} />
-          </TrashContext.Provider>
-          <Box
-            component="main"
-            sx={{
-              // backgroundColor: (theme) =>
-              //   theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
-              flexGrow: 1,
-              height: '100vh',
-              overflow: 'hidden',
-            }}
-          >
-            {/* // TODO: Grid layout  */}
-            <Container
-              maxWidth="lg"
+        <PlaylistsContext.Provider value={{ playlists, setPlaylists }}>
+          <Box sx={{ display: 'flex' }}>
+            <CssBaseline />
+            <TrashContext.Provider value={{ trash, setTrash }}>
+              <Bar handlePlaying={handlePlaying} />
+            </TrashContext.Provider>
+            <Box
+              component="main"
               sx={{
-                p: 1,
-                mt: '4rem',
-                height: 'calc(100% - 4rem)',
-                position: 'relative',
-                display: 'flex',
-                flexWrap: 'wrap',
-                rowGap: '0',
+                // backgroundColor: (theme) =>
+                //   theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
+                flexGrow: 1,
+                height: '100vh',
+                overflow: 'hidden',
               }}
             >
-              <MusicPlayer playlists={playlists} setPlaylists={setPlaylists} ref={ref} />
-              {playlists.items.map((playlistsItem: Playlist) => (
-                <List
-                  playlists={playlists}
-                  playlistsItem={playlistsItem}
-                  key={playlistsItem.id}
-                  handlePlaylist={handlePlaylist}
-                  handlePlaylistAt={handlePlaylistAt}
-                />
-              ))}
-            </Container>
+              {/* // TODO: Grid layout  */}
+              <Container
+                maxWidth="lg"
+                sx={{
+                  p: 1,
+                  mt: '4rem',
+                  height: 'calc(100% - 4rem)',
+                  position: 'relative',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  rowGap: '0',
+                }}
+              >
+                <MusicPlayer ref={ref} />
+                {playlists.items.map((playlistsItem: Playlist) => (
+                  <List
+                    playlistsItem={playlistsItem}
+                    key={playlistsItem.id}
+                    handlePlaylist={handlePlaylist}
+                    handlePlaylistAt={handlePlaylistAt}
+                  />
+                ))}
+              </Container>
+            </Box>
           </Box>
-        </Box>
+        </PlaylistsContext.Provider>
       </DragDropContext>
     </ThemeProvider>
   );

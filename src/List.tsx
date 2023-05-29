@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box, List as MuiList, Card, CardContent, ListSubheader, Button } from '@mui/material';
 import {
   Droppable,
@@ -10,7 +10,7 @@ import {
 import { FixedSizeList, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Item from './Item';
-import { Playlist, PlaylistItem, Playlists } from './Dashboard';
+import { Playlist, PlaylistItem, Playlists, PlaylistsContext } from './Dashboard';
 
 const getRenderItem =
   (items: PlaylistItem[]) =>
@@ -33,7 +33,6 @@ const getRenderItem =
 
 type RowProps = {
   data: {
-    playlists: Playlists;
     playlistsItem: Playlist;
     handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
   };
@@ -41,7 +40,8 @@ type RowProps = {
   style: Object;
 };
 
-const Row = React.memo(({ data: { playlists, playlistsItem, handlePlaylistAt }, index, style }: RowProps) => {
+const Row = React.memo(({ data: { playlistsItem, handlePlaylistAt }, index, style }: RowProps) => {
+  const { playlists } = useContext(PlaylistsContext);
   const playlistItem = playlistsItem.items[index];
   const renderItem = getRenderItem(playlistsItem.items);
 
@@ -60,14 +60,14 @@ const Row = React.memo(({ data: { playlists, playlistsItem, handlePlaylistAt }, 
 }, areEqual);
 
 type ListProps = {
-  playlists: Playlists;
   playlistsItem: Playlist;
   handlePlaylist: (newPlaylist: Playlist) => void;
   handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
 };
 
 export default function List(props: ListProps) {
-  const { playlists, playlistsItem, handlePlaylist, handlePlaylistAt } = props;
+  const { playlistsItem, handlePlaylist, handlePlaylistAt } = props;
+  const { playlists } = useContext(PlaylistsContext);
   const renderItem = getRenderItem(playlistsItem.items);
 
   return (
@@ -98,7 +98,7 @@ export default function List(props: ListProps) {
                       itemSize={48.48}
                       width={width ?? 0}
                       outerRef={provided.innerRef}
-                      itemData={{ playlists, playlistsItem, handlePlaylistAt }}
+                      itemData={{ playlistsItem, handlePlaylistAt }}
                     >
                       {Row}
                     </FixedSizeList>

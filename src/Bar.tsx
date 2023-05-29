@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   Box,
@@ -18,7 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { Droppable } from 'react-beautiful-dnd';
-import { Playlist, Playlists, TrashContext } from './Dashboard';
+import { Playlist, PlaylistsContext, TrashContext } from './Dashboard';
 import { getPlaylists } from './api';
 
 interface AppBarProps extends MuiAppBarProps {
@@ -88,14 +88,13 @@ function Copyright(props: any) {
 }
 
 type BarProps = {
-  playlists: Playlists;
-  setPlaylists: Dispatch<SetStateAction<Playlists>>;
   handlePlaying: (playing: boolean) => void;
 };
 
 export default function Bar(props: BarProps) {
   // TODO: change playlist
-  const { playlists, setPlaylists, handlePlaying } = props;
+  const { handlePlaying } = props;
+  const { playlists, setPlaylists } = useContext(PlaylistsContext);
 
   const reloadPlaylists = () => {
     setPlaylists((prev) => {
