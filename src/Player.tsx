@@ -153,6 +153,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   const handleReplay = () => {
     console.log('handleReplay');
     playerRef.current?.seekTo(0);
+    handlePlaying(true);
   };
 
   const handlePrevious = () => {
