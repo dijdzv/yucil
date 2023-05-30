@@ -35,7 +35,7 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) 
               })
               .then((playlistItemListResponse) => {
                 // TODO: playlistItemListResponse.result.pageInfo.totalResultsの回数取得するようにする
-                console.log('playlistItemListResponse', playlistItemListResponse);
+                // console.log('playlistItemListResponse', playlistItemListResponse);
 
                 const playlistItems = playlistItemListResponse.result.items;
 

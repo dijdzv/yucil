@@ -164,6 +164,10 @@ export default function Dashboard() {
     ref.current.handlePlaying(playing);
   };
 
+  const getPlayingPlaylistUrl = (): string => {
+    return ref.current.getVideoUrl();
+  };
+
   const reorder = (prev: Playlists, startIndex: number, startId: string, endIndex: number, endId: string) => {
     const result = prev;
     const startPlaylist = result.getPlaylist(startId);
@@ -246,7 +250,7 @@ export default function Dashboard() {
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <TrashContext.Provider value={{ trash, setTrash }}>
-              <Bar handlePlaying={handlePlaying} />
+              <Bar handlePlaying={handlePlaying} getPlayingPlaylistUrl={getPlayingPlaylistUrl} />
             </TrashContext.Provider>
             <Box
               component="main"

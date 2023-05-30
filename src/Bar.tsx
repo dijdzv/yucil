@@ -15,6 +15,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import DeleteIcon from '@mui/icons-material/Delete';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { Droppable } from 'react-beautiful-dnd';
@@ -89,11 +90,12 @@ function Copyright(props: any) {
 
 type BarProps = {
   handlePlaying: (playing: boolean) => void;
+  getPlayingPlaylistUrl: () => string;
 };
 
 export default function Bar(props: BarProps) {
   // TODO: change playlist
-  const { handlePlaying } = props;
+  const { handlePlaying, getPlayingPlaylistUrl } = props;
   const { playlists, setPlaylists } = useContext(PlaylistsContext);
 
   const reloadPlaylists = () => {
@@ -129,6 +131,9 @@ export default function Bar(props: BarProps) {
     <>
       <AppBar position="absolute" open={open} sx={{ backgroundColor: '#000' }}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <IconButton sx={{ ml: 5 }} onClick={() => window.open(getPlayingPlaylistUrl(), '_blank')}>
+            <OpenInNewIcon />
+          </IconButton>
           <Box />
           <Typography component="h1" variant="h6" color="inherit" noWrap>
             <Copyright sx={{}} />

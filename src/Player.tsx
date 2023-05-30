@@ -25,6 +25,7 @@ export interface MusicPlayerRefHandle {
   handlePlaylistAt(index: number): void;
   handlePlaying(playing?: boolean): void;
   isExist(): boolean;
+  getVideoUrl(): string;
 }
 
 export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer(props, ref) {
@@ -77,6 +78,9 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
         isExist(): boolean {
           return playerRef.current !== null && playerRef.current.getInternalPlayer() !== null;
         },
+        getVideoUrl(): string {
+          return playerRef.current?.getInternalPlayer().getVideoUrl();
+        },
       };
     },
     []
@@ -113,6 +117,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
 
   const handleOnPlay = () => {
     console.log('handleOnPlay');
+    console.log(playerRef.current?.getInternalPlayer().getVideoUrl());
     intervalRef.current !== null && stopTimer();
     intervalRef.current === null && startTimer();
   };
