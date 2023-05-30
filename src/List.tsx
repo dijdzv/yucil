@@ -61,7 +61,7 @@ const Row = React.memo(({ data: { playlistsItem, handlePlaylistAt }, index, styl
 
 type ListProps = {
   playlistsItem: Playlist;
-  handlePlaylist: (newPlaylist: Playlist) => void;
+  handlePlaylist: (newPlaylist: Playlist, index?: number) => void;
   handlePlaylistAt: (newPlaylist: Playlist, index: number) => void;
 };
 

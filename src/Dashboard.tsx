@@ -136,15 +136,15 @@ export default function Dashboard() {
         ref.current.handlePlaylistAt(index);
       }
     } else {
-      //! FIXME: ここでindexに変更されていない
-      handlePlaylist({ ...newPlaylist, index });
+      handlePlaylist(newPlaylist, index);
       setTimeout(() => {
         ref.current.handlePlaylistAt(index);
       }, 1000);
     }
   };
 
-  const handlePlaylist = (newPlaylist: Playlist) => {
+  const handlePlaylist = (newPlaylist: Playlist, index?: number) => {
+    const newIndex = index === undefined ? newPlaylist.index : index;
     if (playlists.isPlayingPlaylist(newPlaylist.id)) return;
     setPlaylists((prev) => {
       prev.deselectPlaylist();
@@ -153,6 +153,7 @@ export default function Dashboard() {
     setTimeout(() => {
       setPlaylists((prev) => {
         prev.setPlaylistId(newPlaylist.id);
+        prev.setPlaylistIndex(newPlaylist.id, newIndex);
         return prev.copy();
       });
       handlePlaying(true);
