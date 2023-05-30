@@ -91,12 +91,12 @@ export default function List(props: ListProps) {
             <Droppable droppableId={playlistsItem?.id} renderClone={renderItem} mode="virtual">
               {(provided) => (
                 <AutoSizer>
-                  {({ height, width }) => (
+                  {({ height, width }: AutoSizerStateProps) => (
                     <FixedSizeList
-                      height={height ?? 0}
+                      height={height}
                       itemCount={playlistsItem.items.length}
                       itemSize={48.48}
-                      width={width ?? 0}
+                      width={width}
                       outerRef={provided.innerRef}
                       itemData={{ playlistsItem, handlePlaylistAt }}
                     >
@@ -112,3 +112,13 @@ export default function List(props: ListProps) {
     </Card>
   );
 }
+
+/**
+ * This type definition is copied from the type definition of react-virtualized-auto-sizer.
+ */
+type AutoSizerStateProps = {
+  height: number;
+  scaledHeight: number;
+  scaledWidth: number;
+  width: number;
+};

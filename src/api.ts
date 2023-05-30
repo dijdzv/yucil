@@ -19,6 +19,8 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) 
         maxResults: 50,
       })
       .then((playlistsResponse) => {
+        // console.log('playlistsResponse', playlistsResponse);
+
         const playlists = playlistsResponse.result.items;
         playlists?.sort((a, b) => {
           return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
@@ -33,7 +35,7 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) 
               })
               .then((playlistItemListResponse) => {
                 // TODO: playlistItemListResponse.result.pageInfo.totalResultsの回数取得するようにする
-                // console.log('playlistItemListResponse', playlistItemListResponse);
+                console.log('playlistItemListResponse', playlistItemListResponse);
 
                 const playlistItems = playlistItemListResponse.result.items;
 
