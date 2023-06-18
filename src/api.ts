@@ -5,13 +5,13 @@ import { Playlist, PlaylistItem, Playlists } from './Dashboard';
 import { DraggableLocation } from 'react-beautiful-dnd';
 
 export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) {
+  //! FIXME: tokenClientやgapiがundefinedになっているかもしれないし、通信で止まってるのかもしれない
   tokenClient.callback = (resp: any) => {
     if (resp.error !== undefined) {
       throw resp;
     }
     // GIS has automatically updated gapi.client with the newly issued access token.
     console.log('gapi.client access token: ' + JSON.stringify(gapi.client.getToken()));
-
     gapi.client.youtube.playlists
       .list({
         part: 'snippet',
@@ -20,7 +20,6 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) 
       })
       .then((playlistsResponse) => {
         // console.log('playlistsResponse', playlistsResponse);
-
         const playlists = playlistsResponse.result.items;
         playlists?.sort((a, b) => {
           return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
@@ -36,9 +35,7 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) 
               .then((playlistItemListResponse) => {
                 // TODO: playlistItemListResponse.result.pageInfo.totalResultsの回数取得するようにする
                 // console.log('playlistItemListResponse', playlistItemListResponse);
-
                 const playlistItems = playlistItemListResponse.result.items;
-
                 const newPlaylistItems: PlaylistItem[] =
                   playlistItems?.map((playlistItem) => {
                     return {
@@ -81,8 +78,6 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) 
       .catch((err) => console.log(err));
   };
 
-  // Conditionally ask users to select the Google Account they'd like to use,
-  // and explicitly obtain their consent to fetch their Calendar.
   // NOTE: To request an access token a user gesture is necessary.
   if (gapi.client.getToken() === null) {
     // Prompt the user to select a Google Account and asked for consent to share their data

@@ -119,6 +119,7 @@ export default function Dashboard() {
   const ref = useRef({} as MusicPlayerRefHandle);
 
   useEffect(() => {
+    //! FIXME build時にエラーになる
     getPlaylists(setPlaylists);
   }, []);
 
