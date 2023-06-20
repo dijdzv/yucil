@@ -7,7 +7,9 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
-import { deletePlaylistItem, getPlaylists, updatePlaylistItems, insertPlaylistItem } from './api';
+import { deletePlaylistItem, fetchPlaylists, updatePlaylistItems, insertPlaylistItem } from './api';
+import { PlaylistComponent } from './test';
+import { useGoogleLogin } from '@react-oauth/google';
 // import { invoke } from '@tauri-apps/api';
 
 export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
@@ -113,15 +115,31 @@ export default function Dashboard() {
       }),
     [prefersDarkMode]
   );
+
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<Playlists>(new Playlists([], undefined));
   const [trash, setTrash] = useState<PlaylistItem[]>([]);
 
   const ref = useRef({} as MusicPlayerRefHandle);
 
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => setAccessToken(codeResponse.access_token),
+    onError: (error) => console.error(error),
+    onNonOAuthError: (error) => console.error(error),
+    flow: 'implicit',
+    scope: 'https://www.googleapis.com/auth/youtube',
+  });
+
   useEffect(() => {
-    //! FIXME build時にエラーになる
-    getPlaylists(setPlaylists);
+    setTimeout(() => {
+      // login();
+      fetchPlaylists(setPlaylists);
+    }, 500);
   }, []);
+
+  // useEffect(() => {
+  //   fetchPlaylists(setPlaylists);
+  // }, [accessToken]);
 
   console.log('playlist change: ', playlists.getPlayingPlaylist());
 
@@ -251,7 +269,11 @@ export default function Dashboard() {
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <TrashContext.Provider value={{ trash, setTrash }}>
-              <Bar handlePlaying={handlePlaying} getPlayingPlaylistUrl={getPlayingPlaylistUrl} />
+              <Bar
+                handlePlaying={handlePlaying}
+                getPlayingPlaylistUrl={getPlayingPlaylistUrl}
+                accessToken={accessToken}
+              />
             </TrashContext.Provider>
             <Box
               component="main"
@@ -285,6 +307,7 @@ export default function Dashboard() {
                     handlePlaylistAt={handlePlaylistAt}
                   />
                 ))}
+                {/* <PlaylistComponent /> */}
               </Container>
             </Box>
           </Box>

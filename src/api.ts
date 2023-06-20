@@ -1,11 +1,10 @@
 declare let tokenClient: any;
-declare const google: any;
+// declare const google: any;
 import { Dispatch, SetStateAction } from 'react';
 import { Playlist, PlaylistItem, Playlists } from './Dashboard';
 import { DraggableLocation } from 'react-beautiful-dnd';
 
-export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) {
-  //! FIXME: tokenClientやgapiがundefinedになっているかもしれないし、通信で止まってるのかもしれない
+export const fetchPlaylists = (setPlaylists: Dispatch<SetStateAction<Playlists>>) => {
   tokenClient.callback = (resp: any) => {
     if (resp.error !== undefined) {
       throw resp;
@@ -89,7 +88,7 @@ export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) 
     console.log('skipping access token');
     tokenClient.requestAccessToken({ prompt: '' });
   }
-}
+};
 
 // export function revokeToken() {
 //   let cred = gapi.client.getToken();
@@ -135,11 +134,11 @@ export const insertPlaylistItem = (
   return true;
 };
 
-export function updatePlaylistItems(
+export const updatePlaylistItems = (
   playlists: Playlists,
   source: DraggableLocation,
   destination: DraggableLocation
-): boolean {
+): boolean => {
   const sourcePlaylist = playlists.getPlaylist(source.droppableId);
   const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
@@ -169,7 +168,7 @@ export function updatePlaylistItems(
       return false;
     });
   return true;
-}
+};
 
 export const deletePlaylistItem = (playlists: Playlists, source: DraggableLocation): boolean => {
   const sourcePlaylist = playlists.getPlaylist(source.droppableId);
