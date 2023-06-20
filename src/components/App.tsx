@@ -1,6 +1,6 @@
 import Dashboard from './Dashboard';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import './App.css';
+import '../App.css';
 
 function App() {
   return (

@@ -7,8 +7,8 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
-import { deletePlaylistItem, fetchPlaylists, updatePlaylistItems, insertPlaylistItem } from './api';
-import { PlaylistComponent } from './test';
+import { deletePlaylistItem, fetchPlaylists, updatePlaylistItems, insertPlaylistItem } from '../api';
+import { PlaylistComponent } from '../test';
 import { useGoogleLogin } from '@react-oauth/google';
 // import { invoke } from '@tauri-apps/api';
 
@@ -132,14 +132,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     setTimeout(() => {
-      // login();
-      fetchPlaylists(setPlaylists);
-    }, 500);
+      login();
+    }, 100);
   }, []);
 
-  // useEffect(() => {
-  //   fetchPlaylists(setPlaylists);
-  // }, [accessToken]);
+  useEffect(() => {
+    accessToken && fetchPlaylists(setPlaylists, accessToken);
+  }, [accessToken]);
 
   console.log('playlist change: ', playlists.getPlayingPlaylist());
 

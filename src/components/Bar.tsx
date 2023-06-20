@@ -20,8 +20,7 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { Droppable } from 'react-beautiful-dnd';
 import { Playlist, PlaylistsContext, TrashContext } from './Dashboard';
-import { fetchPlaylists } from './api';
-import { access } from 'fs';
+import { fetchPlaylists } from '../api';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -107,7 +106,7 @@ export default function Bar(props: BarProps) {
     });
     handlePlaying(false);
     setTimeout(() => {
-      fetchPlaylists(setPlaylists);
+      accessToken && fetchPlaylists(setPlaylists, accessToken);
     }, 200);
   };
 
