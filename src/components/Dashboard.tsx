@@ -168,8 +168,8 @@ export default function Dashboard() {
 
     if (isSamePlaylist) {
       setPlaylists((prev) => {
-        const isSuccess = updatePlaylistItems(prev, source, destination);
-        if (isSuccess) {
+        const isUpdateSuccess = updatePlaylistItems(prev, source, destination);
+        if (isUpdateSuccess) {
           return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
         }
         return prev.copy();

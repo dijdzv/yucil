@@ -1,78 +1,75 @@
 import { Dispatch, SetStateAction } from 'react';
 import { Playlist, PlaylistItem, Playlists } from './class/playlists';
 import { DraggableLocation } from 'react-beautiful-dnd';
+import axios from 'axios';
 
 const YOUTUBE_API_URL = {
   PLAYLISTS: 'https://www.googleapis.com/youtube/v3/playlists',
   PLAYLIST_ITEMS: 'https://www.googleapis.com/youtube/v3/playlistItems',
 };
 
-export const fetchPlaylists = (setPlaylists: Dispatch<SetStateAction<Playlists>>, accessToken: string) => {
-  gapi.client.youtube.playlists
-    .list({
+export async function fetchPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>, accessToken: string) {
+  if (!accessToken) return;
+
+  const { data: playlistsData } = (await axios.get(YOUTUBE_API_URL.PLAYLISTS, {
+    params: {
       part: 'snippet',
       mine: true,
       maxResults: 50,
-    })
-    .then((playlistsResponse) => {
-      // console.log('playlistsResponse', playlistsResponse);
-      const playlists = playlistsResponse.result.items;
-      playlists?.sort((a, b) => {
-        return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
-      });
-      const playlistsPromise: Promise<Playlist>[] =
-        playlists?.map(async (playlist, playlistIndex) => {
-          return gapi.client.youtube.playlistItems
-            .list({
-              part: 'snippet',
-              playlistId: playlist.id,
-              maxResults: 50,
-            })
-            .then((playlistItemListResponse) => {
-              // TODO: playlistItemListResponse.result.pageInfo.totalResultsの回数取得するようにする
-              // console.log('playlistItemListResponse', playlistItemListResponse);
-              const playlistItems = playlistItemListResponse.result.items;
-              const newPlaylistItems: PlaylistItem[] =
-                playlistItems?.map((playlistItem) => {
-                  return {
-                    id: playlistItem.id || 'undefined',
-                    title: playlistItem.snippet?.title || 'undefined',
-                    thumbnail: playlistItem.snippet?.thumbnails?.default?.url || '',
-                    channelId: playlistItem.snippet?.videoOwnerChannelId || 'undefined',
-                    channelTitle: playlistItem.snippet?.videoOwnerChannelTitle || 'undefined',
-                    position: playlistItem.snippet?.position || 0,
-                    resourceId: {
-                      kind: playlistItem.snippet?.resourceId?.kind || '',
-                      videoId: playlistItem.snippet?.resourceId?.videoId || '',
-                    },
-                    playlistId: playlist.id || 'undefined',
-                  };
-                }) || [];
-              return {
-                id: playlist.id || 'undefined',
-                title: playlist.snippet?.title || 'undefined',
-                thumbnail: playlist.snippet?.thumbnails?.default?.url || '',
-                items: newPlaylistItems,
-                index: 0,
-              };
-            })
-            .catch((err) => {
-              console.log(err);
-              return {
-                id: 'undefined',
-                title: 'undefined',
-                thumbnail: '',
-                items: [],
-                index: 0,
-              };
-            });
-        }) || [];
-      Promise.all(playlistsPromise).then((newPlaylists) => {
-        setPlaylists(new Playlists(newPlaylists, playlists?.at(0)?.id));
-      });
-    })
-    .catch((err) => console.log(err));
-};
+      access_token: accessToken,
+    },
+  })) as { data: gapi.client.youtube.PlaylistListResponse };
+
+  const playlists = playlistsData.items;
+  if (!playlists) return;
+
+  playlists.sort((a, b) => {
+    return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
+  });
+
+  const playlistsPromise = playlists.map(async (playlist) => {
+    const playlistsItems: PlaylistItem[] = [];
+    let nextPageToken = undefined;
+    while (true) {
+      const { data: playlistItemsData } = (await axios.get(YOUTUBE_API_URL.PLAYLIST_ITEMS, {
+        params: {
+          part: 'snippet',
+          playlistId: playlist.id,
+          maxResults: 50,
+          access_token: accessToken,
+          pageToken: nextPageToken,
+        },
+      })) as { data: gapi.client.youtube.PlaylistItemListResponse };
+      const items = playlistItemsData.items?.map((playlistItem) => ({
+        id: playlistItem.id || 'undefined',
+        title: playlistItem.snippet?.title || 'undefined',
+        thumbnail: playlistItem.snippet?.thumbnails?.default?.url || '',
+        channelId: playlistItem.snippet?.videoOwnerChannelId || 'undefined',
+        channelTitle: playlistItem.snippet?.videoOwnerChannelTitle || 'undefined',
+        position: playlistItem.snippet?.position || 0,
+        resourceId: {
+          kind: playlistItem.snippet?.resourceId?.kind || '',
+          videoId: playlistItem.snippet?.resourceId?.videoId || '',
+        },
+        playlistId: playlist.id || 'undefined',
+      }));
+      playlistsItems.push(...(items || []));
+      nextPageToken = playlistItemsData.nextPageToken;
+      if (!nextPageToken) break;
+    }
+    return {
+      id: playlist.id || 'undefined',
+      title: playlist.snippet?.title || 'undefined',
+      thumbnail: playlist.snippet?.thumbnails?.default?.url || '',
+      items: playlistsItems,
+      index: 0,
+    } as Playlist;
+  });
+
+  Promise.all(playlistsPromise).then((newPlaylists) => {
+    setPlaylists(new Playlists(newPlaylists, playlists?.at(0)?.id));
+  });
+}
 
 export const insertPlaylistItem = (
   playlists: Playlists,
