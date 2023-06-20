@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Playlist, PlaylistItem, Playlists } from './components/Dashboard';
+import { Playlist, PlaylistItem, Playlists } from './class/playlists';
 import { DraggableLocation } from 'react-beautiful-dnd';
 
 const YOUTUBE_API_URL = {

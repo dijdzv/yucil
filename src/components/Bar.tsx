@@ -19,8 +19,9 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { Droppable } from 'react-beautiful-dnd';
-import { Playlist, PlaylistsContext, TrashContext } from './Dashboard';
+import { PlaylistsContext, TrashContext } from './Dashboard';
 import { fetchPlaylists } from '../api';
+import { Playlist } from '../class/playlists';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
