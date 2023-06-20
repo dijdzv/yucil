@@ -8,7 +8,6 @@ import Bar from './Bar';
 import List from './List';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
 import { deletePlaylistItem, fetchPlaylists, updatePlaylistItems, insertPlaylistItem } from '../api';
-import { PlaylistComponent } from '../test';
 import { useGoogleLogin } from '@react-oauth/google';
 import { Playlist, PlaylistItem, Playlists } from '../class/playlists';
 // import { invoke } from '@tauri-apps/api';
@@ -231,7 +230,6 @@ export default function Dashboard() {
                     handlePlaylistAt={handlePlaylistAt}
                   />
                 ))}
-                {/* <PlaylistComponent /> */}
               </Container>
             </Box>
           </Box>
