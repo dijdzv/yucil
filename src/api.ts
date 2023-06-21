@@ -8,9 +8,7 @@ const YOUTUBE_API_URL = {
   PLAYLIST_ITEMS: 'https://www.googleapis.com/youtube/v3/playlistItems',
 };
 
-export async function fetchPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>, accessToken: string) {
-  if (!accessToken) return;
-
+export async function fetchPlaylists(accessToken: string, setPlaylists: Dispatch<SetStateAction<Playlists>>) {
   const { data: playlistsData } = (await axios.get(YOUTUBE_API_URL.PLAYLISTS, {
     params: {
       part: 'snippet',
@@ -36,8 +34,8 @@ export async function fetchPlaylists(setPlaylists: Dispatch<SetStateAction<Playl
           part: 'snippet',
           playlistId: playlist.id,
           maxResults: 50,
-          access_token: accessToken,
           pageToken: nextPageToken,
+          access_token: accessToken,
         },
       })) as { data: gapi.client.youtube.PlaylistItemListResponse };
       const items = playlistItemsData.items?.map((playlistItem) => ({
@@ -105,7 +103,8 @@ export const insertPlaylistItem = (
   return true;
 };
 
-export const updatePlaylistItems = (
+export const updatePlaylistItem = (
+  accessToken: string,
   playlists: Playlists,
   source: DraggableLocation,
   destination: DraggableLocation
@@ -114,10 +113,11 @@ export const updatePlaylistItems = (
   const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
-  gapi.client.youtube.playlistItems
-    .update({
-      part: 'snippet',
-      resource: {
+
+  axios
+    .put(
+      YOUTUBE_API_URL.PLAYLIST_ITEMS + '?part=snippet',
+      {
         id: sourcePlaylistItem.id,
         snippet: {
           playlistId: destinationPlaylistItem.playlistId,
@@ -130,7 +130,12 @@ export const updatePlaylistItems = (
           position: destinationPlaylistItem.position,
         },
       },
-    })
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
     .then((response) => {
       console.log(response);
     })
@@ -138,6 +143,7 @@ export const updatePlaylistItems = (
       console.log(err);
       return false;
     });
+
   return true;
 };
 

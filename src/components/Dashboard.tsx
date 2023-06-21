@@ -7,7 +7,7 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
-import { deletePlaylistItem, fetchPlaylists, updatePlaylistItems, insertPlaylistItem } from '../api';
+import { deletePlaylistItem, fetchPlaylists, updatePlaylistItem, insertPlaylistItem } from '../api';
 import { useGoogleLogin } from '@react-oauth/google';
 import { Playlist, PlaylistItem, Playlists } from '../class/playlists';
 // import { invoke } from '@tauri-apps/api';
@@ -61,7 +61,8 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    accessToken && fetchPlaylists(setPlaylists, accessToken);
+    if (!accessToken) return;
+    fetchPlaylists(accessToken, setPlaylists);
   }, [accessToken]);
 
   console.log('playlist change: ', playlists.getPlayingPlaylist());
@@ -121,6 +122,8 @@ export default function Dashboard() {
   };
 
   const onDragEnd = (result: DropResult) => {
+    if (!accessToken) return;
+
     const { source, destination } = result;
 
     const isNotDropped = !destination;
@@ -167,7 +170,7 @@ export default function Dashboard() {
 
     if (isSamePlaylist) {
       setPlaylists((prev) => {
-        const isUpdateSuccess = updatePlaylistItems(prev, source, destination);
+        const isUpdateSuccess = updatePlaylistItem(accessToken, prev, source, destination);
         if (isUpdateSuccess) {
           return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
         }
