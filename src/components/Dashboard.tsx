@@ -139,7 +139,7 @@ export default function Dashboard() {
 
     if (destination.droppableId === 'trash') {
       setPlaylists((prev) => {
-        const isDeleteSuccess = deletePlaylistItem(prev, source);
+        const isDeleteSuccess = deletePlaylistItem(accessToken, prev, source);
         if (isDeleteSuccess) {
           const deleted = prev.getPlaylist(source.droppableId).items.splice(source.index, 1)[0];
           deleted &&
@@ -178,8 +178,8 @@ export default function Dashboard() {
       });
     } else {
       setPlaylists((prev) => {
-        const isDeleteSuccess = deletePlaylistItem(prev, source);
-        const isInsertSuccess = isDeleteSuccess && insertPlaylistItem(prev, source, destination);
+        const isDeleteSuccess = deletePlaylistItem(accessToken, prev, source);
+        const isInsertSuccess = isDeleteSuccess && insertPlaylistItem(accessToken, prev, source, destination);
         if (isDeleteSuccess && isInsertSuccess) {
           return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
         }

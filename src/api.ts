@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { Playlist, PlaylistItem, Playlists } from './class/playlists';
 import { DraggableLocation } from 'react-beautiful-dnd';
 import axios from 'axios';
+import { access } from 'fs';
 
 const YOUTUBE_API_URL = {
   PLAYLISTS: 'https://www.googleapis.com/youtube/v3/playlists',
@@ -70,40 +71,6 @@ export async function fetchPlaylists(accessToken: string, setPlaylists: Dispatch
 }
 
 export const insertPlaylistItem = (
-  playlists: Playlists,
-  source: DraggableLocation,
-  destination: DraggableLocation
-): boolean => {
-  const sourcePlaylist = playlists.getPlaylist(source.droppableId);
-  const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
-  const sourcePlaylistItem = sourcePlaylist.items[source.index];
-  const destinationPlaylistItem = destinationPlaylist.items[destination.index];
-
-  gapi.client.youtube.playlistItems
-    .insert({
-      part: 'snippet',
-      resource: {
-        snippet: {
-          playlistId: destinationPlaylistItem.playlistId,
-          resourceId: {
-            kind: destinationPlaylistItem.resourceId.kind,
-            videoId: sourcePlaylistItem.resourceId.videoId,
-          },
-          position: destinationPlaylistItem.position,
-        },
-      },
-    })
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((err) => {
-      console.log(err);
-      return false;
-    });
-  return true;
-};
-
-export const updatePlaylistItem = (
   accessToken: string,
   playlists: Playlists,
   source: DraggableLocation,
@@ -115,22 +82,22 @@ export const updatePlaylistItem = (
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
 
   axios
-    .put(
-      YOUTUBE_API_URL.PLAYLIST_ITEMS + '?part=snippet',
+    .post(
+      YOUTUBE_API_URL.PLAYLIST_ITEMS,
       {
-        id: sourcePlaylistItem.id,
         snippet: {
           playlistId: destinationPlaylistItem.playlistId,
           resourceId: {
-            channelId: sourcePlaylistItem.channelId,
-            kind: sourcePlaylistItem.resourceId.kind,
-            playlistId: sourcePlaylistItem.playlistId,
+            kind: destinationPlaylistItem.resourceId.kind,
             videoId: sourcePlaylistItem.resourceId.videoId,
           },
           position: destinationPlaylistItem.position,
         },
       },
       {
+        params: {
+          part: 'snippet',
+        },
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -147,13 +114,65 @@ export const updatePlaylistItem = (
   return true;
 };
 
-export const deletePlaylistItem = (playlists: Playlists, source: DraggableLocation): boolean => {
+export const updatePlaylistItem = (
+  accessToken: string,
+  playlists: Playlists,
+  source: DraggableLocation,
+  destination: DraggableLocation
+): boolean => {
+  const sourcePlaylist = playlists.getPlaylist(source.droppableId);
+  const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
+  const sourcePlaylistItem = sourcePlaylist.items[source.index];
+  const destinationPlaylistItem = destinationPlaylist.items[destination.index];
+
+  axios
+    .put(
+      YOUTUBE_API_URL.PLAYLIST_ITEMS,
+      {
+        id: sourcePlaylistItem.id,
+        snippet: {
+          playlistId: destinationPlaylistItem.playlistId,
+          resourceId: {
+            channelId: sourcePlaylistItem.channelId,
+            kind: sourcePlaylistItem.resourceId.kind,
+            playlistId: sourcePlaylistItem.playlistId,
+            videoId: sourcePlaylistItem.resourceId.videoId,
+          },
+          position: destinationPlaylistItem.position,
+        },
+      },
+      {
+        params: {
+          part: 'snippet',
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((err) => {
+      console.log(err);
+      return false;
+    });
+
+  return true;
+};
+
+export const deletePlaylistItem = (accessToken: string, playlists: Playlists, source: DraggableLocation): boolean => {
   const sourcePlaylist = playlists.getPlaylist(source.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
 
-  gapi.client.youtube.playlistItems
-    .delete({
-      id: sourcePlaylistItem.id,
+  axios
+    .delete(YOUTUBE_API_URL.PLAYLIST_ITEMS, {
+      params: {
+        id: sourcePlaylistItem.id,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     })
     .then((response) => {
       console.log(response);
@@ -162,5 +181,6 @@ export const deletePlaylistItem = (playlists: Playlists, source: DraggableLocati
       console.log(err);
       return false;
     });
+
   return true;
 };

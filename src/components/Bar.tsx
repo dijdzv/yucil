@@ -107,7 +107,7 @@ export default function Bar(props: BarProps) {
     });
     handlePlaying(false);
     setTimeout(() => {
-      accessToken && fetchPlaylists(setPlaylists, accessToken);
+      accessToken && fetchPlaylists(accessToken, setPlaylists);
     }, 200);
   };
 

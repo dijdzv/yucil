@@ -11,7 +11,7 @@ import { FixedSizeList, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Item from './Item';
 import { PlaylistsContext } from './Dashboard';
-import { Playlist, PlaylistItem, Playlists } from '../class/playlists';
+import { Playlist, PlaylistItem } from '../class/playlists';
 
 const getRenderItem =
   (items: PlaylistItem[]) =>
