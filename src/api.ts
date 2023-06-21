@@ -1,112 +1,76 @@
-declare let tokenClient: any;
-declare const google: any;
 import { Dispatch, SetStateAction } from 'react';
-import { Playlist, PlaylistItem, Playlists } from './Dashboard';
+import { Playlist, PlaylistItem, Playlists } from './class/playlists';
 import { DraggableLocation } from 'react-beautiful-dnd';
+import axios from 'axios';
 
-export function getPlaylists(setPlaylists: Dispatch<SetStateAction<Playlists>>) {
-  tokenClient.callback = (resp: any) => {
-    if (resp.error !== undefined) {
-      throw resp;
+const YOUTUBE_API_URL = {
+  PLAYLISTS: 'https://www.googleapis.com/youtube/v3/playlists',
+  PLAYLIST_ITEMS: 'https://www.googleapis.com/youtube/v3/playlistItems',
+};
+
+export async function fetchPlaylists(accessToken: string, setPlaylists: Dispatch<SetStateAction<Playlists>>) {
+  const { data: playlistsData } = (await axios.get(YOUTUBE_API_URL.PLAYLISTS, {
+    params: {
+      part: 'snippet',
+      mine: true,
+      maxResults: 50,
+      access_token: accessToken,
+    },
+  })) as { data: gapi.client.youtube.PlaylistListResponse };
+
+  const playlists = playlistsData.items;
+  if (!playlists) return;
+
+  playlists.sort((a, b) => {
+    return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
+  });
+
+  const playlistsPromise = playlists.map(async (playlist) => {
+    const playlistsItems: PlaylistItem[] = [];
+    let nextPageToken = undefined;
+    while (true) {
+      const { data: playlistItemsData } = (await axios.get(YOUTUBE_API_URL.PLAYLIST_ITEMS, {
+        params: {
+          part: 'snippet',
+          playlistId: playlist.id,
+          maxResults: 50,
+          pageToken: nextPageToken,
+          access_token: accessToken,
+        },
+      })) as { data: gapi.client.youtube.PlaylistItemListResponse };
+      const items = playlistItemsData.items?.map((playlistItem) => ({
+        id: playlistItem.id || 'undefined',
+        title: playlistItem.snippet?.title || 'undefined',
+        thumbnail: playlistItem.snippet?.thumbnails?.default?.url || '',
+        channelId: playlistItem.snippet?.videoOwnerChannelId || 'undefined',
+        channelTitle: playlistItem.snippet?.videoOwnerChannelTitle || 'undefined',
+        position: playlistItem.snippet?.position || 0,
+        resourceId: {
+          kind: playlistItem.snippet?.resourceId?.kind || '',
+          videoId: playlistItem.snippet?.resourceId?.videoId || '',
+        },
+        playlistId: playlist.id || 'undefined',
+      }));
+      playlistsItems.push(...(items || []));
+      nextPageToken = playlistItemsData.nextPageToken;
+      if (!nextPageToken) break;
     }
-    // GIS has automatically updated gapi.client with the newly issued access token.
-    console.log('gapi.client access token: ' + JSON.stringify(gapi.client.getToken()));
+    return {
+      id: playlist.id || 'undefined',
+      title: playlist.snippet?.title || 'undefined',
+      thumbnail: playlist.snippet?.thumbnails?.default?.url || '',
+      items: playlistsItems,
+      index: 0,
+    } as Playlist;
+  });
 
-    gapi.client.youtube.playlists
-      .list({
-        part: 'snippet',
-        mine: true,
-        maxResults: 50,
-      })
-      .then((playlistsResponse) => {
-        // console.log('playlistsResponse', playlistsResponse);
-
-        const playlists = playlistsResponse.result.items;
-        playlists?.sort((a, b) => {
-          return a.snippet?.title?.localeCompare(b.snippet?.title || '') || 0;
-        });
-        const playlistsPromise: Promise<Playlist>[] =
-          playlists?.map(async (playlist, playlistIndex) => {
-            return gapi.client.youtube.playlistItems
-              .list({
-                part: 'snippet',
-                playlistId: playlist.id,
-                maxResults: 50,
-              })
-              .then((playlistItemListResponse) => {
-                // TODO: playlistItemListResponse.result.pageInfo.totalResultsの回数取得するようにする
-                // console.log('playlistItemListResponse', playlistItemListResponse);
-
-                const playlistItems = playlistItemListResponse.result.items;
-
-                const newPlaylistItems: PlaylistItem[] =
-                  playlistItems?.map((playlistItem) => {
-                    return {
-                      id: playlistItem.id || 'undefined',
-                      title: playlistItem.snippet?.title || 'undefined',
-                      thumbnail: playlistItem.snippet?.thumbnails?.default?.url || '',
-                      channelId: playlistItem.snippet?.videoOwnerChannelId || 'undefined',
-                      channelTitle: playlistItem.snippet?.videoOwnerChannelTitle || 'undefined',
-                      position: playlistItem.snippet?.position || 0,
-                      resourceId: {
-                        kind: playlistItem.snippet?.resourceId?.kind || '',
-                        videoId: playlistItem.snippet?.resourceId?.videoId || '',
-                      },
-                      playlistId: playlist.id || 'undefined',
-                    };
-                  }) || [];
-                return {
-                  id: playlist.id || 'undefined',
-                  title: playlist.snippet?.title || 'undefined',
-                  thumbnail: playlist.snippet?.thumbnails?.default?.url || '',
-                  items: newPlaylistItems,
-                  index: 0,
-                };
-              })
-              .catch((err) => {
-                console.log(err);
-                return {
-                  id: 'undefined',
-                  title: 'undefined',
-                  thumbnail: '',
-                  items: [],
-                  index: 0,
-                };
-              });
-          }) || [];
-        Promise.all(playlistsPromise).then((newPlaylists) => {
-          setPlaylists(new Playlists(newPlaylists, playlists?.at(0)?.id));
-        });
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // Conditionally ask users to select the Google Account they'd like to use,
-  // and explicitly obtain their consent to fetch their Calendar.
-  // NOTE: To request an access token a user gesture is necessary.
-  if (gapi.client.getToken() === null) {
-    // Prompt the user to select a Google Account and asked for consent to share their data
-    // when establishing a new session.
-    console.log('Requesting access token');
-    tokenClient.requestAccessToken({ prompt: 'consent' });
-  } else {
-    // Skip display of account chooser and consent dialog for an existing session.
-    console.log('skipping access token');
-    tokenClient.requestAccessToken({ prompt: '' });
-  }
+  Promise.all(playlistsPromise).then((newPlaylists) => {
+    setPlaylists(new Playlists(newPlaylists, playlists?.at(0)?.id));
+  });
 }
 
-// export function revokeToken() {
-//   let cred = gapi.client.getToken();
-//   if (cred !== null) {
-//     google.accounts.oauth2.revoke(cred.access_token, () => {
-//       console.log('Revoked: ' + cred.access_token);
-//     });
-//     gapi.client.setToken(null);
-//   }
-// }
-
 export const insertPlaylistItem = (
+  accessToken: string,
   playlists: Playlists,
   source: DraggableLocation,
   destination: DraggableLocation
@@ -116,10 +80,10 @@ export const insertPlaylistItem = (
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
 
-  gapi.client.youtube.playlistItems
-    .insert({
-      part: 'snippet',
-      resource: {
+  axios
+    .post(
+      YOUTUBE_API_URL.PLAYLIST_ITEMS,
+      {
         snippet: {
           playlistId: destinationPlaylistItem.playlistId,
           resourceId: {
@@ -129,7 +93,15 @@ export const insertPlaylistItem = (
           position: destinationPlaylistItem.position,
         },
       },
-    })
+      {
+        params: {
+          part: 'snippet',
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
     .then((response) => {
       console.log(response);
     })
@@ -137,22 +109,25 @@ export const insertPlaylistItem = (
       console.log(err);
       return false;
     });
+
   return true;
 };
 
-export function updatePlaylistItems(
+export const updatePlaylistItem = (
+  accessToken: string,
   playlists: Playlists,
   source: DraggableLocation,
   destination: DraggableLocation
-): boolean {
+): boolean => {
   const sourcePlaylist = playlists.getPlaylist(source.droppableId);
   const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
-  gapi.client.youtube.playlistItems
-    .update({
-      part: 'snippet',
-      resource: {
+
+  axios
+    .put(
+      YOUTUBE_API_URL.PLAYLIST_ITEMS,
+      {
         id: sourcePlaylistItem.id,
         snippet: {
           playlistId: destinationPlaylistItem.playlistId,
@@ -165,7 +140,15 @@ export function updatePlaylistItems(
           position: destinationPlaylistItem.position,
         },
       },
-    })
+      {
+        params: {
+          part: 'snippet',
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
     .then((response) => {
       console.log(response);
     })
@@ -173,16 +156,22 @@ export function updatePlaylistItems(
       console.log(err);
       return false;
     });
-  return true;
-}
 
-export const deletePlaylistItem = (playlists: Playlists, source: DraggableLocation): boolean => {
+  return true;
+};
+
+export const deletePlaylistItem = (accessToken: string, playlists: Playlists, source: DraggableLocation): boolean => {
   const sourcePlaylist = playlists.getPlaylist(source.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
 
-  gapi.client.youtube.playlistItems
-    .delete({
-      id: sourcePlaylistItem.id,
+  axios
+    .delete(YOUTUBE_API_URL.PLAYLIST_ITEMS, {
+      params: {
+        id: sourcePlaylistItem.id,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     })
     .then((response) => {
       console.log(response);
@@ -191,5 +180,6 @@ export const deletePlaylistItem = (playlists: Playlists, source: DraggableLocati
       console.log(err);
       return false;
     });
+
   return true;
 };

@@ -7,7 +7,9 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import Bar from './Bar';
 import List from './List';
 import { MusicPlayer, MusicPlayerRefHandle } from './Player';
-import { deletePlaylistItem, getPlaylists, updatePlaylistItems, insertPlaylistItem } from './api';
+import { deletePlaylistItem, fetchPlaylists, updatePlaylistItem, insertPlaylistItem } from '../api';
+import { useGoogleLogin } from '@react-oauth/google';
+import { Playlist, PlaylistItem, Playlists } from '../class/playlists';
 // import { invoke } from '@tauri-apps/api';
 
 export const BASE_PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
@@ -26,82 +28,6 @@ type PlaylistsContextProps = {
 
 export const PlaylistsContext = React.createContext({} as PlaylistsContextProps);
 
-export class Playlists {
-  public items: Playlist[];
-  public playlistId: string | undefined;
-
-  constructor(playlists: Playlist[], playlistId?: string) {
-    this.items = playlists;
-    this.playlistId = playlistId;
-  }
-
-  /**
-   * You need to check with isExistPlaylist before using this.
-   * Always succeeds if droppableId is used for playlistId
-   */
-  public getPlaylist(playlistId?: string): Playlist {
-    return this.items.find((playlist) => playlist.id === playlistId) as Playlist;
-  }
-
-  public getPlayingPlaylist(): Playlist {
-    return this.getPlaylist(this.playlistId);
-  }
-
-  public setPlaylistId(playlistId: string) {
-    this.playlistId = playlistId;
-  }
-
-  public setPlaylistIndex(playlistId: string, index: number) {
-    this.getPlaylist(playlistId).index = index;
-  }
-
-  public setPlayingPlaylistIndex(index: number) {
-    this.getPlayingPlaylist().index = index;
-  }
-
-  public isPlayingPlaylist(playlistId: string): boolean {
-    return this.playlistId === playlistId;
-  }
-
-  public isPlayingPosition(playlistId: string, index: number): boolean {
-    return this.isPlayingPlaylist(playlistId) && this.getPlayingPlaylist().index === index;
-  }
-
-  public isExistPlaylist(playlistId: string): boolean {
-    return this.items.some((playlist) => playlist.id === playlistId);
-  }
-
-  public deselectPlaylist() {
-    this.playlistId = undefined;
-  }
-
-  public copy(): Playlists {
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
-  }
-}
-
-export type Playlist = {
-  id: string;
-  title: string;
-  thumbnail: string;
-  items: PlaylistItem[];
-  index: number;
-};
-
-export type PlaylistItem = {
-  id: string;
-  title: string;
-  thumbnail: string;
-  channelId: string;
-  channelTitle: string;
-  position: number;
-  resourceId: {
-    kind: string;
-    videoId: string;
-  };
-  playlistId: string;
-};
-
 export default function Dashboard() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const theme = useMemo(
@@ -113,14 +39,31 @@ export default function Dashboard() {
       }),
     [prefersDarkMode]
   );
+
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<Playlists>(new Playlists([], undefined));
   const [trash, setTrash] = useState<PlaylistItem[]>([]);
 
   const ref = useRef({} as MusicPlayerRefHandle);
 
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => setAccessToken(codeResponse.access_token),
+    onError: (error) => console.error(error),
+    onNonOAuthError: (error) => console.error(error),
+    flow: 'implicit',
+    scope: 'https://www.googleapis.com/auth/youtube',
+  });
+
   useEffect(() => {
-    getPlaylists(setPlaylists);
+    setTimeout(() => {
+      login();
+    }, 100);
   }, []);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    fetchPlaylists(accessToken, setPlaylists);
+  }, [accessToken]);
 
   console.log('playlist change: ', playlists.getPlayingPlaylist());
 
@@ -178,7 +121,10 @@ export default function Dashboard() {
     return result;
   };
 
+  //! FIXME: isXxxSuccessが毎回trueになっている。別のロジックで判定する必要がある。
   const onDragEnd = (result: DropResult) => {
+    if (!accessToken) return;
+
     const { source, destination } = result;
 
     const isNotDropped = !destination;
@@ -194,7 +140,7 @@ export default function Dashboard() {
 
     if (destination.droppableId === 'trash') {
       setPlaylists((prev) => {
-        const isDeleteSuccess = deletePlaylistItem(prev, source);
+        const isDeleteSuccess = deletePlaylistItem(accessToken, prev, source);
         if (isDeleteSuccess) {
           const deleted = prev.getPlaylist(source.droppableId).items.splice(source.index, 1)[0];
           deleted &&
@@ -225,16 +171,16 @@ export default function Dashboard() {
 
     if (isSamePlaylist) {
       setPlaylists((prev) => {
-        const isSuccess = updatePlaylistItems(prev, source, destination);
-        if (isSuccess) {
+        const isUpdateSuccess = updatePlaylistItem(accessToken, prev, source, destination);
+        if (isUpdateSuccess) {
           return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
         }
         return prev.copy();
       });
     } else {
       setPlaylists((prev) => {
-        const isDeleteSuccess = deletePlaylistItem(prev, source);
-        const isInsertSuccess = isDeleteSuccess && insertPlaylistItem(prev, source, destination);
+        const isDeleteSuccess = deletePlaylistItem(accessToken, prev, source);
+        const isInsertSuccess = isDeleteSuccess && insertPlaylistItem(accessToken, prev, source, destination);
         if (isDeleteSuccess && isInsertSuccess) {
           return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
         }
@@ -250,7 +196,11 @@ export default function Dashboard() {
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <TrashContext.Provider value={{ trash, setTrash }}>
-              <Bar handlePlaying={handlePlaying} getPlayingPlaylistUrl={getPlayingPlaylistUrl} />
+              <Bar
+                handlePlaying={handlePlaying}
+                getPlayingPlaylistUrl={getPlayingPlaylistUrl}
+                accessToken={accessToken}
+              />
             </TrashContext.Provider>
             <Box
               component="main"

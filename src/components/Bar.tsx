@@ -19,8 +19,9 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { Droppable } from 'react-beautiful-dnd';
-import { Playlist, PlaylistsContext, TrashContext } from './Dashboard';
-import { getPlaylists } from './api';
+import { PlaylistsContext, TrashContext } from './Dashboard';
+import { fetchPlaylists } from '../api';
+import { Playlist } from '../class/playlists';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -91,11 +92,12 @@ function Copyright(props: any) {
 type BarProps = {
   handlePlaying: (playing: boolean) => void;
   getPlayingPlaylistUrl: () => string;
+  accessToken: string | null;
 };
 
 export default function Bar(props: BarProps) {
   // TODO: change playlist
-  const { handlePlaying, getPlayingPlaylistUrl } = props;
+  const { handlePlaying, getPlayingPlaylistUrl, accessToken } = props;
   const { playlists, setPlaylists } = useContext(PlaylistsContext);
 
   const reloadPlaylists = () => {
@@ -105,7 +107,7 @@ export default function Bar(props: BarProps) {
     });
     handlePlaying(false);
     setTimeout(() => {
-      getPlaylists(setPlaylists);
+      accessToken && fetchPlaylists(accessToken, setPlaylists);
     }, 200);
   };
 
