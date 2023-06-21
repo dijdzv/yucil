@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from 'react';
 import { Playlist, PlaylistItem, Playlists } from './class/playlists';
 import { DraggableLocation } from 'react-beautiful-dnd';
 import axios from 'axios';
-import { access } from 'fs';
 
 const YOUTUBE_API_URL = {
   PLAYLISTS: 'https://www.googleapis.com/youtube/v3/playlists',

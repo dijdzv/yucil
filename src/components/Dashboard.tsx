@@ -121,6 +121,7 @@ export default function Dashboard() {
     return result;
   };
 
+  //! FIXME: isXxxSuccessが毎回trueになっている。別のロジックで判定する必要がある。
   const onDragEnd = (result: DropResult) => {
     if (!accessToken) return;
 
