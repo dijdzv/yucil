@@ -69,18 +69,18 @@ export async function fetchPlaylists(accessToken: string, setPlaylists: Dispatch
   });
 }
 
-export const insertPlaylistItem = (
+export async function insertPlaylistItem(
   accessToken: string,
   playlists: Playlists,
   source: DraggableLocation,
   destination: DraggableLocation
-): boolean => {
+): Promise<boolean> {
   const sourcePlaylist = playlists.getPlaylist(source.droppableId);
   const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
 
-  axios
+  const isInsertSuccess = await axios
     .post(
       YOUTUBE_API_URL.PLAYLIST_ITEMS,
       {
@@ -104,27 +104,28 @@ export const insertPlaylistItem = (
     )
     .then((response) => {
       console.log(response);
+      return true;
     })
     .catch((err) => {
       console.log(err);
       return false;
     });
 
-  return true;
-};
+  return isInsertSuccess;
+}
 
-export const updatePlaylistItem = (
+export async function updatePlaylistItem(
   accessToken: string,
   playlists: Playlists,
   source: DraggableLocation,
   destination: DraggableLocation
-): boolean => {
+): Promise<boolean> {
   const sourcePlaylist = playlists.getPlaylist(source.droppableId);
   const destinationPlaylist = playlists.getPlaylist(destination.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
   const destinationPlaylistItem = destinationPlaylist.items[destination.index];
 
-  axios
+  const isUpdateSuccess = await axios
     .put(
       YOUTUBE_API_URL.PLAYLIST_ITEMS,
       {
@@ -151,20 +152,25 @@ export const updatePlaylistItem = (
     )
     .then((response) => {
       console.log(response);
+      return true;
     })
     .catch((err) => {
       console.log(err);
       return false;
     });
 
-  return true;
-};
+  return isUpdateSuccess;
+}
 
-export const deletePlaylistItem = (accessToken: string, playlists: Playlists, source: DraggableLocation): boolean => {
+export async function deletePlaylistItem(
+  accessToken: string,
+  playlists: Playlists,
+  source: DraggableLocation
+): Promise<boolean> {
   const sourcePlaylist = playlists.getPlaylist(source.droppableId);
   const sourcePlaylistItem = sourcePlaylist.items[source.index];
 
-  axios
+  const isDeleteSuccess = await axios
     .delete(YOUTUBE_API_URL.PLAYLIST_ITEMS, {
       params: {
         id: sourcePlaylistItem.id,
@@ -175,11 +181,12 @@ export const deletePlaylistItem = (accessToken: string, playlists: Playlists, so
     })
     .then((response) => {
       console.log(response);
+      return true;
     })
     .catch((err) => {
       console.log(err);
       return false;
     });
 
-  return true;
-};
+  return isDeleteSuccess;
+}

@@ -121,7 +121,7 @@ export default function Dashboard() {
     return result;
   };
 
-  //! FIXME: isXxxSuccessが毎回trueになっている。別のロジックで判定する必要がある。
+  // TODO: apu操作が失敗したときの処理
   const onDragEnd = (result: DropResult) => {
     if (!accessToken) return;
 
@@ -140,14 +140,14 @@ export default function Dashboard() {
 
     if (destination.droppableId === 'trash') {
       setPlaylists((prev) => {
-        const isDeleteSuccess = deletePlaylistItem(accessToken, prev, source);
-        if (isDeleteSuccess) {
-          const deleted = prev.getPlaylist(source.droppableId).items.splice(source.index, 1)[0];
-          deleted &&
-            setTrash((prev) => {
-              return [...prev, deleted];
-            });
-        }
+        deletePlaylistItem(accessToken, prev, source);
+
+        const deleted = prev.getPlaylist(source.droppableId).items.splice(source.index, 1)[0];
+        deleted &&
+          setTrash((prev) => {
+            return [...prev, deleted];
+          });
+
         return prev.copy();
       });
       return;
@@ -171,20 +171,14 @@ export default function Dashboard() {
 
     if (isSamePlaylist) {
       setPlaylists((prev) => {
-        const isUpdateSuccess = updatePlaylistItem(accessToken, prev, source, destination);
-        if (isUpdateSuccess) {
-          return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
-        }
-        return prev.copy();
+        updatePlaylistItem(accessToken, prev, source, destination);
+        return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
       });
     } else {
       setPlaylists((prev) => {
-        const isDeleteSuccess = deletePlaylistItem(accessToken, prev, source);
-        const isInsertSuccess = isDeleteSuccess && insertPlaylistItem(accessToken, prev, source, destination);
-        if (isDeleteSuccess && isInsertSuccess) {
-          return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
-        }
-        return prev.copy();
+        deletePlaylistItem(accessToken, prev, source);
+        insertPlaylistItem(accessToken, prev, source, destination);
+        return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
       });
     }
   };
