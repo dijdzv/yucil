@@ -54,7 +54,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   };
 
   //! FIXME: player側で自動で次に行くとき、setPlaylistを使う
-
+  // TODO: shuffle時の挙動を追加する
   useImperativeHandle(
     ref,
     () => {
@@ -129,7 +129,26 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   const handleOnEnded = () => {
     console.log('handleOnEnded');
     stopTimer();
-    handlePlaying(false);
+    // handlePlaying(false);
+    if (oneLoop) {
+      handleReplay();
+    } else {
+      const now = playlist.index;
+      if (now === playlist.items.length) {
+        if (!loop) return;
+        playerRef.current?.getInternalPlayer().playVideoAt(0);
+        setPlaylists((prev) => {
+          prev.setPlayingPlaylistIndex(0);
+          return prev.copy();
+        });
+      } else {
+        playerRef.current?.getInternalPlayer().playVideoAt(now + 1);
+        setPlaylists((prev) => {
+          prev.setPlayingPlaylistIndex(now + 1);
+          return prev.copy();
+        });
+      }
+    }
   };
 
   const handleOnPause = () => {
@@ -162,9 +181,10 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   };
 
   const handlePrevious = () => {
+    if (!('index' in playlist)) return;
     console.log('handlePrevious');
-    const now = playlist.index;
-    const previous = now === undefined || now === 0 ? playlist.items.length : now - 1;
+    let now = playlist.index;
+    const previous = now === 0 ? playlist.items.length : now - 1;
     playerRef.current?.getInternalPlayer().playVideoAt(previous);
     setPlaylists((prev) => {
       prev.setPlayingPlaylistIndex(previous);
@@ -174,9 +194,10 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   };
 
   const handleNext = () => {
+    if (!('index' in playlist)) return;
     console.log('handleNext');
-    const now = playlist?.index;
-    const next = now === undefined || now === playlist?.items.length ? 0 : now + 1;
+    const now = playlist.index;
+    const next = now === playlist.items.length ? 0 : now + 1;
     playerRef.current?.getInternalPlayer().playVideoAt(next);
     setPlaylists((prev) => {
       prev.setPlayingPlaylistIndex(next);

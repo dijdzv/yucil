@@ -190,11 +190,7 @@ export default function Dashboard() {
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <TrashContext.Provider value={{ trash, setTrash }}>
-              <Bar
-                handlePlaying={handlePlaying}
-                getPlayingPlaylistUrl={getPlayingPlaylistUrl}
-                accessToken={accessToken}
-              />
+              <Bar handlePlaying={handlePlaying} getPlayingPlaylistUrl={getPlayingPlaylistUrl} login={login} />
             </TrashContext.Provider>
             <Box
               component="main"

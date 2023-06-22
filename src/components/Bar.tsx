@@ -92,23 +92,16 @@ function Copyright(props: any) {
 type BarProps = {
   handlePlaying: (playing: boolean) => void;
   getPlayingPlaylistUrl: () => string;
-  accessToken: string | null;
+  login: () => void;
 };
 
 export default function Bar(props: BarProps) {
   // TODO: change playlist
-  const { handlePlaying, getPlayingPlaylistUrl, accessToken } = props;
+  const { handlePlaying, getPlayingPlaylistUrl, login } = props;
   const { playlists, setPlaylists } = useContext(PlaylistsContext);
 
   const reloadPlaylists = () => {
-    setPlaylists((prev) => {
-      prev.deselectPlaylist();
-      return prev.copy();
-    });
-    handlePlaying(false);
-    setTimeout(() => {
-      accessToken && fetchPlaylists(accessToken, setPlaylists);
-    }, 200);
+    login();
   };
 
   const [open, setOpen] = useState(false);
