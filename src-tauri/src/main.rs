@@ -3,22 +3,16 @@
 
 use tauri::{utils::config::AppUrl, WindowUrl};
 
-#[allow(unused)]
-#[tauri::command]
-async fn get_playlists() -> Vec<String> {
-  yucil::youtube::get_youtube_playlists().await.unwrap()
-}
-
 fn main() {
+  let port = portpicker::pick_unused_port().expect("failed to find unused port");
+
   let mut context = tauri::generate_context!();
-  let port = 1421;
+  // let port = 1421;
   let url = format!("http://localhost:{}", port).parse().unwrap();
   let window_url = WindowUrl::External(url);
-  context.config_mut().build.dist_dir = AppUrl::Url(window_url.clone());
-  context.config_mut().build.dev_path = AppUrl::Url(window_url);
+  context.config_mut().build.dist_dir = AppUrl::Url(window_url);
 
   tauri::Builder::default()
-    // .invoke_handler(tauri::generate_handler![get_playlists])
     .plugin(tauri_plugin_localhost::Builder::new(port).build())
     .run(context)
     .expect("error while running yucil");

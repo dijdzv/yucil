@@ -12,15 +12,7 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "http": {
-        "all": false,
-        "request": true
-      }
+      "all": false
     },
     "bundle": {
       "active": true,
