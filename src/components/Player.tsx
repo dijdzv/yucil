@@ -59,7 +59,6 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
     ref,
     () => {
       return {
-        // shuffleを考慮する
         handlePlaylistAt(index: number) {
           const player = playerRef.current?.getInternalPlayer();
           if (player === undefined) return;
@@ -184,7 +183,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
     if (!('index' in playlist)) return;
     console.log('handlePrevious');
     let now = playlist.index;
-    const previous = now === 0 ? playlist.items.length : now - 1;
+    const previous = now === 0 ? playlist.items.length - 1 : now - 1;
     playerRef.current?.getInternalPlayer().playVideoAt(previous);
     setPlaylists((prev) => {
       prev.setPlayingPlaylistIndex(previous);
@@ -197,7 +196,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
     if (!('index' in playlist)) return;
     console.log('handleNext');
     const now = playlist.index;
-    const next = now === playlist.items.length ? 0 : now + 1;
+    const next = now === playlist.items.length - 1 ? 0 : now + 1;
     playerRef.current?.getInternalPlayer().playVideoAt(next);
     setPlaylists((prev) => {
       prev.setPlayingPlaylistIndex(next);
