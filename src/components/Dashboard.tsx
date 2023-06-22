@@ -121,7 +121,7 @@ export default function Dashboard() {
     return result;
   };
 
-  // TODO: apu操作が失敗したときの処理
+  // TODO: api操作が失敗したときの処理
   const onDragEnd = (result: DropResult) => {
     if (!accessToken) return;
 
