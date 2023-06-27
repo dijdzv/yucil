@@ -53,7 +53,6 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
     return minutes + ':' + ('00' + seconds).slice(-2);
   };
 
-  //! FIXME: player側で自動で次に行くとき、setPlaylistを使う
   // TODO: shuffle時の挙動を追加する
   useImperativeHandle(
     ref,
@@ -117,6 +116,12 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   const handleOnPlay = () => {
     console.log('handleOnPlay');
     console.log(playerRef.current?.getInternalPlayer().getVideoUrl());
+    const now = playerRef.current?.getInternalPlayer().getPlaylistIndex();
+    setPlaylists((prev) => {
+      if (now === undefined) return prev;
+      prev.setPlayingPlaylistIndex(now);
+      return prev.copy();
+    });
     intervalRef.current !== null && stopTimer();
     intervalRef.current === null && startTimer();
   };
@@ -128,26 +133,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   const handleOnEnded = () => {
     console.log('handleOnEnded');
     stopTimer();
-    // handlePlaying(false);
-    if (oneLoop) {
-      handleReplay();
-    } else {
-      const now = playlist.index;
-      if (now === playlist.items.length) {
-        if (!loop) return;
-        playerRef.current?.getInternalPlayer().playVideoAt(0);
-        setPlaylists((prev) => {
-          prev.setPlayingPlaylistIndex(0);
-          return prev.copy();
-        });
-      } else {
-        playerRef.current?.getInternalPlayer().playVideoAt(now + 1);
-        setPlaylists((prev) => {
-          prev.setPlayingPlaylistIndex(now + 1);
-          return prev.copy();
-        });
-      }
-    }
+    handlePlaying(false);
   };
 
   const handleOnPause = () => {
