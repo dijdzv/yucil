@@ -20,7 +20,6 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { Droppable } from 'react-beautiful-dnd';
 import { PlaylistsContext, TrashContext } from './Dashboard';
-import { fetchPlaylists } from '../api';
 import { Playlist } from '../class/playlists';
 
 interface AppBarProps extends MuiAppBarProps {
@@ -32,6 +31,7 @@ const drawerWidth: number = 200;
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<AppBarProps>(({ theme, open }) => ({
+  width: `calc(100% - 56px)`,
   zIndex: theme.zIndex.drawer + 1,
   transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
@@ -80,7 +80,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" className="yucil-2" align="right" {...props}>
       {/* {'Copyright © '} */}
-      <Link className="yucil-1" href="https://github.com/dijdzv/yucil" target="_blank" sx={{ textDecoration: 'none' }}>
+      <Link className="yucil-1" href="https://github.com/dijdzv/yucil" target="_tauri" sx={{ textDecoration: 'none' }}>
         {appName + ' v' + appVersion}
       </Link>{' '}
       {new Date().getFullYear()}
@@ -126,10 +126,11 @@ export default function Bar(props: BarProps) {
     <>
       <AppBar position="absolute" open={open} sx={{ backgroundColor: '#000' }}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <IconButton sx={{ ml: 5 }} onClick={() => window.open(getPlayingPlaylistUrl(), '_blank')}>
-            <OpenInNewIcon />
-          </IconButton>
-          <Box />
+          <Box sx={{ display: 'flex', justifyContent: 'start' }}>
+            <IconButton sx={{}} onClick={() => window.open(getPlayingPlaylistUrl(), '_blank')}>
+              <OpenInNewIcon />
+            </IconButton>
+          </Box>
           <Typography component="h1" variant="h6" color="inherit" noWrap>
             <Copyright sx={{}} />
           </Typography>
