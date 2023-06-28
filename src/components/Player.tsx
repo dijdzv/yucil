@@ -116,6 +116,8 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   const handleOnPlay = () => {
     console.log('handleOnPlay');
     console.log(playerRef.current?.getInternalPlayer().getVideoUrl());
+    // TODO: 再生が始まるたびに呼ばれるので、音楽が始まった時のみ呼ばれるようにする
+    // handleOnReadyはplaylistが呼ばれたときに呼ばれるので、そこで呼べない
     const now = playerRef.current?.getInternalPlayer().getPlaylistIndex();
     setPlaylists((prev) => {
       if (now === undefined) return prev;

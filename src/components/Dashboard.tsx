@@ -72,10 +72,6 @@ export default function Dashboard() {
   const handlePlaylistAt = (newPlaylist: Playlist, index: number) => {
     if (playlists.isPlayingPlaylist(newPlaylist.id)) {
       if (!playlists.isPlayingPosition(newPlaylist.id, index)) {
-        setPlaylists((prev) => {
-          prev.setPlayingPlaylistIndex(index);
-          return prev.copy();
-        });
         ref.current.handlePlaylistAt(index);
       }
     } else {
