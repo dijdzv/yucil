@@ -149,29 +149,21 @@ export default function Dashboard() {
       return;
     }
 
-    // TODO: setPlaylistsが実行されるのを一度にする
     // TODO: 異なるプレイリストに移す時、現在の再生時間に戻す
+    // TODO: destが再生中よりうえにあるとき、再生中のindexを-1する
+    // TODO: 異なるプレイリストに移す時再生中の動画を保持する
     const isNowPlaying = playlists.isPlayingPosition(source.droppableId, source.index);
-    if (isNowPlaying) {
-      setPlaylists((prev) => {
-        if (isSamePlaylist) {
-          prev.setPlayingPlaylistIndex(destination.index);
-          return prev.copy();
-        } else {
-          prev.setPlaylistId(destination.droppableId);
-          prev.setPlaylistIndex(destination.droppableId, destination.index);
-          return prev.copy();
-        }
-      });
-    }
 
     if (isSamePlaylist) {
       setPlaylists((prev) => {
+        isNowPlaying && prev.setPlayingPlaylistIndex(destination.index);
         updatePlaylistItem(accessToken, prev, source, destination);
         return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
       });
     } else {
       setPlaylists((prev) => {
+        isNowPlaying && prev.setPlaylistId(destination.droppableId);
+        isNowPlaying && prev.setPlaylistIndex(destination.droppableId, destination.index);
         deletePlaylistItem(accessToken, prev, source);
         insertPlaylistItem(accessToken, prev, source, destination);
         return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
