@@ -150,13 +150,19 @@ export default function Dashboard() {
     }
 
     // TODO: 異なるプレイリストに移す時、現在の再生時間に戻す
-    // TODO: destが再生中よりうえにあるとき、再生中のindexを-1する
-    // TODO: 異なるプレイリストに移す時再生中の動画を保持する
+    // TODO: updateしたとき、なんかずれてる
+    //! FIXME: 異なるプレイリストに移す時再生中の動画を保持する
     const isNowPlaying = playlists.isPlayingPosition(source.droppableId, source.index);
+    const isNowPlayingUpDst =
+      isSamePlaylist &&
+      playlists.getPlayingPlaylist().index < source.index &&
+      playlists.getPlayingPlaylist().index >= destination.index;
+    console.log('isNowPlayingUpDst', isNowPlayingUpDst);
 
     if (isSamePlaylist) {
       setPlaylists((prev) => {
         isNowPlaying && prev.setPlayingPlaylistIndex(destination.index);
+        isNowPlayingUpDst && prev.setPlayingPlaylistIndex(prev.getPlayingPlaylist().index + 1);
         updatePlaylistItem(accessToken, prev, source, destination);
         return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
       });
