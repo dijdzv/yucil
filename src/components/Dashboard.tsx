@@ -152,24 +152,30 @@ export default function Dashboard() {
     // TODO: 異なるプレイリストに移す時、現在の再生時間に戻す
     //! FIXME: updateしたとき、なんかずれてる
     //! FIXME: 異なるプレイリストに移す時再生中の動画を保持する
-    const isNowPlaying = playlists.isPlayingPosition(source.droppableId, source.index);
-    const isNowPlayingUpDst =
-      isSamePlaylist &&
-      playlists.getPlayingPlaylist().index < source.index &&
-      playlists.getPlayingPlaylist().index >= destination.index;
-    console.log('isNowPlayingUpDst', isNowPlayingUpDst);
+    const isPlayingVideo = playlists.isPlayingPosition(source.droppableId, source.index);
+    const isEqDstAndPlaying =
+      playlists.isPlayingPlaylist(source.droppableId) && playlists.isPlayingPlaylist(destination.droppableId);
+    const isPlayingUpDst =
+      (isSamePlaylist &&
+        isEqDstAndPlaying &&
+        playlists.getPlayingPlaylist().index < source.index &&
+        playlists.getPlayingPlaylist().index >= destination.index) ||
+      (!isSamePlaylist && playlists.getPlayingPlaylist().index >= destination.index);
 
     if (isSamePlaylist) {
       setPlaylists((prev) => {
-        isNowPlaying && prev.setPlayingPlaylistIndex(destination.index);
-        isNowPlayingUpDst && prev.setPlayingPlaylistIndex(prev.getPlayingPlaylist().index + 1);
+        isPlayingVideo && prev.setPlayingPlaylistIndex(destination.index);
+        isPlayingUpDst && prev.setPlayingPlaylistIndex(prev.getPlayingPlaylist().index + 1);
         updatePlaylistItem(accessToken, prev, source, destination);
         return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
       });
     } else {
       setPlaylists((prev) => {
-        isNowPlaying && prev.setPlaylistId(destination.droppableId);
-        isNowPlaying && prev.setPlaylistIndex(destination.droppableId, destination.index);
+        if (isPlayingVideo) {
+          prev.setPlaylistId(destination.droppableId);
+          prev.setPlaylistIndex(destination.droppableId, destination.index);
+        }
+        isPlayingUpDst && prev.setPlayingPlaylistIndex(prev.getPlayingPlaylist().index + 1);
         deletePlaylistItem(accessToken, prev, source);
         insertPlaylistItem(accessToken, prev, source, destination);
         return reorder(prev, source.index, source.droppableId, destination.index, destination.droppableId);
