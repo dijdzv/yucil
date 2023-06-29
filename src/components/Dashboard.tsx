@@ -150,7 +150,7 @@ export default function Dashboard() {
     }
 
     // TODO: 異なるプレイリストに移す時、現在の再生時間に戻す
-    // TODO: updateしたとき、なんかずれてる
+    //! FIXME: updateしたとき、なんかずれてる
     //! FIXME: 異なるプレイリストに移す時再生中の動画を保持する
     const isNowPlaying = playlists.isPlayingPosition(source.droppableId, source.index);
     const isNowPlayingUpDst =
