@@ -85,7 +85,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   );
 
   const startTimer = () => {
-    console.log('startTimer');
+    // console.log('startTimer');
     const player = playerRef.current;
     const currentTime = player?.getCurrentTime() || 0;
     const duration = player?.getDuration() || 0;
@@ -102,7 +102,7 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   };
 
   const stopTimer = () => {
-    console.log('stopTimer');
+    // console.log('stopTimer');
     clearInterval(intervalRef.current ?? undefined);
     intervalRef.current = null;
   };
@@ -116,14 +116,6 @@ export const MusicPlayer = forwardRef<MusicPlayerRefHandle>(function MusicPlayer
   const handleOnPlay = () => {
     console.log('handleOnPlay');
     console.log(playerRef.current?.getInternalPlayer().getVideoUrl());
-    // TODO: 再生が始まるたびに呼ばれるので、音楽が始まった時のみ呼ばれるようにする
-    // handleOnReadyはplaylistが呼ばれたときに呼ばれるので、そこで呼べない
-    const now = playerRef.current?.getInternalPlayer().getPlaylistIndex();
-    setPlaylists((prev) => {
-      if (now === undefined) return prev;
-      prev.setPlayingPlaylistIndex(now);
-      return prev.copy();
-    });
     intervalRef.current !== null && stopTimer();
     intervalRef.current === null && startTimer();
   };

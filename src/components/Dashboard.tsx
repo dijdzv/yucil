@@ -72,6 +72,10 @@ export default function Dashboard() {
   const handlePlaylistAt = (newPlaylist: Playlist, index: number) => {
     if (playlists.isPlayingPlaylist(newPlaylist.id)) {
       if (!playlists.isPlayingPosition(newPlaylist.id, index)) {
+        setPlaylists((prev) => {
+          prev.setPlayingPlaylistIndex(index);
+          return prev.copy();
+        });
         ref.current.handlePlaylistAt(index);
       }
     } else {
@@ -95,7 +99,6 @@ export default function Dashboard() {
         prev.setPlaylistIndex(newPlaylist.id, newIndex);
         return prev.copy();
       });
-      handlePlaying(true);
     }, 200);
   };
 
